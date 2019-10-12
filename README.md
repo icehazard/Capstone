@@ -1,4 +1,4 @@
-# capstone
+# cryptrader.io
 
 ## Project setup
 ```
