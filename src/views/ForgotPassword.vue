@@ -3,7 +3,7 @@
     <v-layout row wrap class="align-center justify-center">
       <v-flex>
         <v-card :elevation="13" class="mx-auto" max-width="500">
-          <div class="primary d-flex mb-3">
+          <div class="gradient d-flex mb-3">
             <p class="display-1 pt-3 mx-auto grey--text text--darken-3">Forgot Password</p>
           </div>
           <v-card-text class="pb-0 pt-5">

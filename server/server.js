@@ -20,8 +20,21 @@ mongo.connect(key.mongo, { useNewUrlParser: true }, function(err, db) {
   io.on("connection", function(socket) {
     console.log(socket.id, "has connected");
 
+
     socket.on("test", function(data) {
+      console.log(data)
       socket.emit("test", data);
     });
+
+    socket.on('getKlines', function (data) {
+      let time = data
+      fetch('https://api.binance.com/api/v1/klines?symbol=IOTAUSDT&interval=5m')
+          .then((resp) => resp.json())
+          .then((info) => {
+              socket.emit('getKlines', info)
+          })
+
+
+  });
   });
 });
