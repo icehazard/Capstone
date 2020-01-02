@@ -20,15 +20,19 @@ export default {
 		}
 	},
 	methods: {
-		getasset() {
-
-		},
 		main() {
-			var margin = { top: 20, right: 20, bottom: 30, left: 50 },
+			var margin = { top: 20, right: 20, bottom: 30, left: 80 },
 				width = 1400 - margin.left - margin.right,
 				height = 700 - margin.top - margin.bottom;
 
 			var parseDate = d3.timeParse("%d-%b-%y");
+
+			var zoom = d3.zoom()
+				.on("zoom", zoomed);
+
+			var t;
+
+			var zoomableInit;
 
 			var x = techan.scale.financetime()
 				.range([0, width]);
@@ -64,7 +68,9 @@ export default {
 
 			var xAxis = d3.axisBottom(x);
 
-			var yAxis = d3.axisLeft(y);
+			var yAxis = d3.axisLeft(y)
+				.ticks(10)
+				.tickFormat(d3.format(",.4f"));;
 
 			var volumeAxis = d3.axisRight(yVolume)
 				.ticks(3)
@@ -80,7 +86,9 @@ export default {
 			var ohlcAnnotation = techan.plot.axisannotation()
 				.axis(yAxis)
 				.orient('left')
-				.format(d3.format(',.2f'));
+				.format(d3.format(',.3f'))
+				.height(35)
+				.width(80);
 
 			var volumeAnnotation = techan.plot.axisannotation()
 				.axis(volumeAxis)
@@ -106,7 +114,8 @@ export default {
 				.attr("x", 0)
 				.attr("y", 0)
 				.attr("width", width)
-				.attr("height", height);
+				.attr("height", height)
+				.call(zoom);
 
 			svg = svg.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -148,22 +157,22 @@ export default {
 				.attr("class", "volume axis");
 
 			svg.append('g')
-				.attr("class", "crosshair ohlc");
+				.attr("class", "crosshair ohlc")
+				.attr("font-size", "14px")
 
 			var coordsText = svg.append('text')
 				.style("text-anchor", "end")
 				.attr("class", "coords")
 				.attr("x", width - 5)
+				.attr("font-size", "16px")
 				.attr("y", 15);
 
 			var feed;
-
-
+			svg.call(zoom)
 			var accessor = ohlc.accessor();
 
-		 	this.interval = setInterval(() => {
+			this.interval = setInterval(() => {
 				this.$socket.client.emit('getKlines');
-				console.log("bitoin")
 				feed = this.klines.map(function(d) {
 					const timestamp = (new Date(d[0]))
 					timestamp.setHours(timestamp.getHours() + 5)
@@ -177,34 +186,40 @@ export default {
 					};
 				}).sort(function(a, b) { return d3.ascending(accessor.d(a), accessor.d(b)); });
 				redraw(feed);
+				zoomableInit = x.zoomable().clamp(false).copy();
+
 
 			}, 1000);
 
 			function redraw(data) {
 				var accessor = ohlc.accessor();
+				t = d3.zoomTransform(svg.node());
 
 				x.domain(data.map(accessor.d));
 				// Show only 150 points on the plot
 				x.zoomable().domain([0, data.length]);
+				//svg.call(zoom.transform, t);
 
 				// Update y scale min max, only on viewable zoomable.domain()
 				y.domain(techan.scale.plot.ohlc(data.slice(0, data.length)).domain());
 				yVolume.domain(techan.scale.plot.volume(data.slice(0, data.length)).domain());
 
-				// Setup a transition for all that support
-				svg.each(function() {
-					var selection = d3.select(this);
-					selection.select('g.x.axis').call(xAxis);
-					selection.select('g.y.axis').call(yAxis);
-					selection.select("g.volume.axis").call(volumeAxis);
 
-					selection.select("g.candlestick").datum(data).call(ohlc);
-					selection.select("g.sma.ma-0").datum(sma0Calculator(data)).call(sma0);
-					selection.select("g.sma.ma-1").datum(sma1Calculator(data)).call(sma1);
-					selection.select("g.volume").datum(data).call(volume);
 
-					svg.select("g.crosshair.ohlc").call(crosshair);
-				});
+				
+				//console.log(zoom.transform)
+				console.log(t)
+
+				svg.select('g.x.axis').call(xAxis);
+				svg.select('g.y.axis').call(yAxis);
+				svg.select("g.volume.axis").call(volumeAxis);
+
+				svg.select("g.candlestick").datum(data).call(ohlc);
+				svg.select("g.sma.ma-0").datum(sma0Calculator(data)).call(sma0);
+				svg.select("g.sma.ma-1").datum(sma1Calculator(data)).call(sma1);
+				svg.select("g.volume").datum(data).call(volume);
+				svg.select("g.crosshair.ohlc").call(crosshair);
+
 			}
 
 			function move(coords) {
@@ -213,25 +228,46 @@ export default {
 				);
 			}
 
+			let that = this;
+
+			function zoomed() {
+				var rescaledY = d3.event.transform.rescaleY(y);
+				yAxis.scale(rescaledY);
+				ohlc.yScale(rescaledY);
+				sma0.yScale(rescaledY)
+				sma1.yScale(rescaledY)
+
+				// Emulates D3 behaviour, required for financetime due to secondary zoomable scale
+				x.zoomable().domain(d3.event.transform.rescaleX(zoomableInit).domain());
+
+				svg.select("g.candlestick").call(ohlc);
+				svg.select('g.x.axis').call(xAxis);
+				svg.select('g.y.axis').call(yAxis);
+				svg.select("g.volume.axis").call(volumeAxis);
+
+				svg.select("g.sma.ma-0").call(sma0);
+				svg.select("g.sma.ma-1").call(sma1);
+				svg.select("g.volume").call(volume);
+				svg.select("g.crosshair.ohlc").call(crosshair);
+
+				t = d3.zoomTransform(svg.node());
+				console.log(t)
+			}
 		}
 	},
 	beforeDestroy() {
-		console.log("dead")
 		clearInterval(this.interval);
 	},
 	mounted() {
 		this.$socket.client.emit('getKlines');
 		this.main()
-
-
-
 	}
 };
 </script>
 
 <style>
 .graph {
-	background-color: #303030;
+	//background-color: #303030;
 }
 
 body {
@@ -239,7 +275,7 @@ body {
 }
 
 text {
-	fill: #000;
+	fill: rgb(216, 216, 216);
 }
 
 path {
@@ -282,6 +318,7 @@ path.volume {
 }
 
 .crosshair .axisannotation path {
-	fill: #dddddd;
+	fill: #000000;
+	font-size: 1em;
 }
 </style>

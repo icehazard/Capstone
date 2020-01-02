@@ -3,15 +3,15 @@
     <v-layout wrap row>
         <v-flex xs12 md9 lg10>
             <div class="top-section">
-                <Graph></Graph>
+                <GraphOG></GraphOG>
             </div>
         </v-flex>
         <v-flex xs6 md3 lg2>
             <div class="top-section ">Trading controls</div>
         </v-flex>
-        <v-flex xs6 md12>
+        <!-- <v-flex xs6 md12>
             <div class="top-section  bottom-section ">Controls</div>
-        </v-flex>
+        </v-flex> -->
     </v-layout>
 
 </v-container>
@@ -19,12 +19,14 @@
 
 <script>
 import HelloWorld from "../components/HelloWorld";
-import Graph from '../components/Graph'
+import Graph from '../components/Graph';
+import GraphOG from '../components/GraphOG';
 
 export default {
     components: {
         HelloWorld,
-        Graph
+        Graph,
+        GraphOG
     },
     sockets: {
       connect() {
@@ -41,7 +43,7 @@ export default {
 
 <style lang="less" scoped>
 .top-section {
-    height: calc(100vh - 30vh);
+    height: 100%;
 }
 
 @media only screen and (min-width: 960px) {

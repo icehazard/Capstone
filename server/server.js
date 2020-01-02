@@ -12,29 +12,26 @@ const client = Binance({ apiKey: key.apiKey, apiSecret: key.apiSecret });
 
 mongo.connect(key.mongo, { useNewUrlParser: true }, function(err, db) {
   if (err) {
-    console.log( err.errmsg);
-  }else {
-    console.log("Connected to Mongo")
+    console.log(err.errmsg);
+  } else {
+    console.log("Connected to Mongo");
   }
 
   io.on("connection", function(socket) {
     console.log(socket.id, "has connected");
 
-
     socket.on("test", function(data) {
-      console.log(data)
+      console.log(data);
       socket.emit("test", data);
     });
 
-    socket.on('getKlines', function (data) {
-      let time = data
-      fetch('https://api.binance.com/api/v1/klines?symbol=IOTAUSDT&interval=5m')
-          .then((resp) => resp.json())
-          .then((info) => {
-              socket.emit('getKlines', info)
-          })
-
-
-  });
+    socket.on("getKlines", function(data) {
+      let time = data;
+      fetch("https://api.binance.com/api/v1/klines?symbol=IOTAUSDT&interval=15m")
+        .then(resp => resp.json())
+        .then(info => {
+          socket.emit("getKlines", info);
+        });
+    });
   });
 });
