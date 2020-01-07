@@ -7,7 +7,7 @@
             </div>
         </v-flex>
         <v-flex xs6 md3 lg2>
-            <div class="top-section ">Trading controls</div>
+            <div class="top-section "><Panel></Panel></div>
         </v-flex>
         <!-- <v-flex xs6 md12>
             <div class="top-section  bottom-section ">Controls</div>
@@ -21,12 +21,14 @@
 import HelloWorld from "../components/HelloWorld";
 import Graph from '../components/Graph';
 import GraphOG from '../components/GraphOG';
+import Panel from "../components/Panel";
 
 export default {
     components: {
         HelloWorld,
         Graph,
-        GraphOG
+        GraphOG,
+        Panel
     },
     sockets: {
       connect() {

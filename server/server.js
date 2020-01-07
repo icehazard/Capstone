@@ -27,11 +27,81 @@ mongo.connect(key.mongo, { useNewUrlParser: true }, function(err, db) {
 
     socket.on("getKlines", function(data) {
       let time = data;
-      fetch("https://api.binance.com/api/v1/klines?symbol=IOTAUSDT&interval=15m")
+      fetch("https://api.binance.com/api/v1/klines?symbol=IOTAUSDT&interval=5m")
         .then(resp => resp.json())
         .then(info => {
           socket.emit("getKlines", info);
         });
+    });
+
+    socket.on("getAssets", async function() {
+      let a = await client.accountInfo();
+      let b = a.balances.filter(item => {
+        return item.free > 0 || item.locked > 0;
+      });
+      //console.log(b);
+      socket.emit("getAssets", b);
+    });
+
+    socket.on('sell', async function () {
+          console.log("sell")
+          let a = await client.accountInfo();
+          let b = a.balances.filter(item => {
+            return item.asset === "IOTA";
+          });
+          let crypto = (parseFloat(b[0].free ) *0.99).toFixed(2);
+
+          console.log(crypto)
+
+          console.log(
+            await client
+              .order({
+                symbol: "IOTAUSDT",
+                side: "SELL",
+                quantity: 80,
+                type: "MARKET"
+              })
+              .catch(error => {
+                console.log(error);
+              })
+          );
+
+          socket.emit('sell', crypto)
+  });
+
+    socket.on("buy", async function() {
+        console.log("buy");
+        let a = await client.accountInfo();
+        let b = a.balances.filter(item => {
+          return item.asset === "USDT";
+        });
+        let usdt = b[0].free;
+
+        console.log(usdt);
+
+        let getPrice = await client.prices();
+
+        let asset = "IOTAUSDT";
+        let toBuy = (usdt / getPrice[asset]) * 0.99;
+
+        toBuy = toBuy.toFixed(2);
+
+        console.log(toBuy);
+
+        console.log(
+          await client
+            .order({
+              symbol: asset,
+              side: "BUY",
+              quantity: toBuy,
+              type: "MARKET"
+            })
+            .catch(error => {
+              console.log(error);
+            })
+        );
+
+        socket.emit("buy", "LONG");
     });
   });
 });

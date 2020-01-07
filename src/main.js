@@ -7,7 +7,8 @@ import vuetify from './plugins/vuetify';
 import io from 'socket.io-client';
 import VueSocketio from 'vue-socket.io-extended';
 
-Vue.use(VueSocketio, io('http://localhost:3000'));
+
+Vue.use(VueSocketio, io('http://192.168.1.36:3000'));
 Vue.config.productionTip = false
 
 new Vue({

@@ -11,25 +11,28 @@ export default {
     name: 'Graph',
     data() {
         return {
-            binanceHistory: [],
             data: [],
             interval: null
         }
     },
     sockets: {
         getKlines(val) {
-            this.klines = val
             this.data = val;
         }
     },
     methods: {
+        mana() {
+            clearInterval(this.refreshing);
+            d3.select(".graph").selectAll("*").remove();
+            this.graph(this.ninja);
+
+        },
         graph(timeframe) {
-            console.log(document.getElementsByClassName("graph")[0].offsetWidth)
             let parentThis = this;
             var dim = {
 
                 width: document.getElementsByClassName("graph")[0].offsetWidth,
-                height: 795,
+                height: 910,
                 margin: {
                     top: 20,
                     right: 60,
@@ -49,13 +52,14 @@ export default {
                 height: dim.height - dim.margin.top - dim.margin.bottom
             };
             dim.indicator.top = dim.ohlc.height + dim.indicator.padding;
-            dim.indicator.bottom = dim.indicator.top + dim.indicator.height + dim.indicator.padding;
+            dim.indicator.bottom = dim.indicator.top + dim.indicator.height;
+            dim.indicator.rsiS = dim.ohlc.height
 
             var indicatorTop = d3.scaleLinear()
-                .range([dim.indicator.top, dim.indicator.bottom]);
+                .range([dim.indicator.top, dim.indicator.top + dim.margin.top]);
 
             window.onresize = function() {
-                d3.select('.graph').call(resize).call(draw);
+                //d3.select('.graph').call(resize).call(draw);
             };
 
 
@@ -153,6 +157,9 @@ export default {
             var rsiScale = macdScale.copy()
                 .range([indicatorTop(1) + dim.indicator.height, indicatorTop(1)]);
 
+            var rsiStochScale = macdScale.copy()
+                .range([indicatorTop(1) + dim.indicator.height, indicatorTop(1)]);
+
             var macd = techan.plot.macd()
                 .xScale(x)
                 .yScale(macdScale);
@@ -173,6 +180,30 @@ export default {
                 .axis(macdAxisLeft)
                 .orient("left")
                 .format(d3.format(',.2f'));
+
+            var rsiStoch = techan.plot.rsi()
+                .xScale(x)
+                .yScale(rsiStochScale);
+
+            var rsiStochAxis = d3.axisRight(rsiStochScale)
+                .ticks(3);
+
+            var rsiStochAnnotation = techan.plot.axisannotation()
+                .axis(rsiStochAxis)
+                .orient("right")
+                .format(d3.format(',.2f'))
+                .translate([x(1), 0]);
+
+            var rsiStochAxisLeft = d3.axisLeft(rsiStochAxis)
+                .ticks(3);
+
+            var rsiStochAnnotationLeft = techan.plot.axisannotation()
+                .axis(rsiStochAxisLeft)
+                .orient("left")
+                .format(d3.format(',.2f'));
+
+
+
 
             var rsi = techan.plot.rsi()
                 .xScale(x)
@@ -230,7 +261,7 @@ export default {
                 .attr("width", dim.plot.width)
                 .attr("height", dim.ohlc.height);
 
-            defs.selectAll("indicatorClip").data([0, 1])
+            defs.selectAll("indicatorClip").data([0, 1, 2])
                 .enter()
                 .append("clipPath")
                 .attr("id", function(d, i) {
@@ -300,7 +331,7 @@ export default {
             ohlcSelection.append("g")
                 .attr("class", "volume axis");
 
-            var indicatorSelection = svg.selectAll("svg > g.indicator").data(["macd", "rsi"]).enter()
+            var indicatorSelection = svg.selectAll("svg > g.indicator").data(["macd", "rsi", "rsiStoch"]).enter()
                 .append("g")
                 .attr("class", function(d) {
                     return d + " indicator";
@@ -320,6 +351,9 @@ export default {
                     return "url(#indicatorClip-" + i + ")";
                 });
 
+
+            // doc
+
             // Add trendlines and other interactions last to be above zoom pane
             svg.append('g')
                 .attr("class", "crosshair ohlc");
@@ -329,6 +363,9 @@ export default {
 
             svg.append('g')
                 .attr("class", "crosshair rsi");
+
+            document.getElementsByClassName("rsi")[0].style.transform = " translate(0px, 120px)"
+            document.getElementsByClassName("rsiStoch")[0].style.transform = " translate(0px, 280px)"
 
             svg.call(zoom)
 
@@ -372,6 +409,7 @@ export default {
                 macdScale.domain(techan.scale.plot.macd(macdData).domain());
                 var rsiData = techan.indicator.rsi()(data);
                 rsiScale.domain(techan.scale.plot.rsi(rsiData).domain());
+                //rsiStochScale.domain(techan.scale.plot.rsi(rsiData).domain());
 
                 svg.select("g.candlestick").datum(data).call(candlestick).call(zoom)
                 svg.select("g.close.annotation").datum([data[data.length - 1]]).call(closeAnnotation);
@@ -381,6 +419,7 @@ export default {
                 svg.select("g.ema.ma-2").datum(techan.indicator.ema().period(200)(data)).call(ema2);
                 svg.select("g.macd .indicator-plot").datum(macdData).call(macd);
                 svg.select("g.rsi .indicator-plot").datum(rsiData).call(rsi);
+                svg.select("g.rsiStoch .indicator-plot").datum(rsiData).call(rsiStoch);
 
                 zoomableInit = x.zoomable().domain([0, data.length]).clamp(false).copy(); // Zoom in a little to hide indicator preroll
 
@@ -400,9 +439,6 @@ export default {
 
             this.interval = setInterval(() => {
                 this.$socket.client.emit('getKlines');
-
-
-
 
                 var accessor = candlestick.accessor(),
                     indicatorPreRoll = 33; // Don't show where indicators don't have data
@@ -426,12 +462,27 @@ export default {
                 var macdData = techan.indicator.macd()(data);
                 macdScale.domain(techan.scale.plot.macd(macdData).domain());
                 var rsiData = techan.indicator.rsi()(data);
+                var rsiStochData = JSON.parse(JSON.stringify(rsiData));
                 rsiScale.domain(techan.scale.plot.rsi(rsiData).domain());
 
-                function change() {
-                    this.$emit('data', 'data')
+                let collection = [];
+                const period = 50;
+                let highest, lowest, stochRSI;
+
+                for (let i in rsiStochData) {
+                    collection.push(rsiStochData[i])
+                    rsiStochData[i].date = rsiData[i].date
+
+                    if (collection.length >= period) {
+                        lowest = collection.reduce((min, p) => p.rsi < min ? p.rsi : min, collection[0].rsi)
+                        highest = collection.reduce((max, p) => p.rsi > max ? p.rsi : max, collection[0].rsi)
+                        stochRSI = (rsiStochData[i].rsi - lowest) / (highest - lowest) * 100
+                        rsiStochData[i].rsi = stochRSI
+                        collection.shift()
+                    }
                 }
 
+                rsiStochScale.domain(techan.scale.plot.rsi(rsiStochData).domain());
                 x.domain(techan.scale.plot.time(data).domain()).zoomable()
                 svg.call(zoom.transform, t);
 
@@ -445,6 +496,7 @@ export default {
                 svg.select("g.ema.ma-2").datum(techan.indicator.ema().period(200)(data)).call(ema2);
                 svg.select("g.macd .indicator-plot").datum(macdData).call(macd);
                 svg.select("g.rsi .indicator-plot").datum(rsiData).call(rsi);
+                svg.select("g.rsiStoch .indicator-plot").datum(rsiStochData).call(rsiStoch);
 
                 svg.select("g.crosshair.ohlc").call(ohlcCrosshair)
                 svg.select("g.crosshair.macd").call(macdCrosshair)
@@ -480,6 +532,8 @@ export default {
                 svg.select("g.rsi .axis.right").call(rsiAxis);
                 svg.select("g.macd .axis.left").call(macdAxisLeft);
                 svg.select("g.rsi .axis.left").call(rsiAxisLeft);
+                svg.select("g.rsiStoch .axis.right").call(rsiAxis);
+                svg.select("g.rsiStoch .axis.left").call(rsiAxisLeft);
 
                 // We know the data does not change, a simple refresh that does not perform data joins will suffice.
                 svg.select("g.candlestick").call(candlestick);
@@ -490,6 +544,7 @@ export default {
                 svg.select("g .ema.ma-2").call(ema2);
                 svg.select("g.macd .indicator-plot").call(macd);
                 svg.select("g.rsi .indicator-plot").call(rsi);
+                svg.select("g.rsiStoch .indicator-plot").call(rsiStoch);
                 svg.select("g.crosshair.ohlc").call(ohlcCrosshair);
                 svg.select("g.crosshair.macd").call(macdCrosshair);
             }
@@ -708,7 +763,6 @@ path.zero {
 
 .graph {
     height: 100vh;
-    
 }
 
 .line {
