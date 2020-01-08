@@ -378,70 +378,9 @@ export default {
                 )
 
 
-            let newData = () => {
-                var accessor = candlestick.accessor(),
-                    indicatorPreRoll = 33; // Don't show where indicators don't have data
-
-
-
-                let data = this.data.map(function(d) {
-                    const timestamp = (new Date(d[0]))
-                    timestamp.setHours(timestamp.getHours() + 5)
-                    return {
-
-                        date: timestamp,
-                        open: +d[1],
-                        high: +d[2],
-                        low: +d[3],
-                        close: +d[4],
-                        volume: +d[5]
-                    };
-                }).sort(function(a, b) {
-                    return d3.ascending(accessor.d(a), accessor.d(b));
-                });
-
-                x.domain(techan.scale.plot.time(data).domain());
-                y.domain(techan.scale.plot.ohlc(data.slice(indicatorPreRoll)).domain());
-                yPercent.domain(techan.scale.plot.percent(y, accessor(data[indicatorPreRoll])).domain());
-                yVolume.domain(techan.scale.plot.volume(data).domain())
-
-                var macdData = techan.indicator.macd()(data);
-                macdScale.domain(techan.scale.plot.macd(macdData).domain());
-                var rsiData = techan.indicator.rsi()(data);
-                rsiScale.domain(techan.scale.plot.rsi(rsiData).domain());
-                //rsiStochScale.domain(techan.scale.plot.rsi(rsiData).domain());
-
-                svg.select("g.candlestick").datum(data).call(candlestick).call(zoom)
-                svg.select("g.close.annotation").datum([data[data.length - 1]]).call(closeAnnotation);
-                svg.select("g.volume").datum(data).call(volume);
-                svg.select("g.sma.ma-0").datum(techan.indicator.sma().period(21)(data)).call(sma0);
-                svg.select("g.sma.ma-1").datum(techan.indicator.sma().period(50)(data)).call(sma1);
-                svg.select("g.ema.ma-2").datum(techan.indicator.ema().period(200)(data)).call(ema2);
-                svg.select("g.macd .indicator-plot").datum(macdData).call(macd);
-                svg.select("g.rsi .indicator-plot").datum(rsiData).call(rsi);
-                svg.select("g.rsiStoch .indicator-plot").datum(rsiData).call(rsiStoch);
-
-                zoomableInit = x.zoomable().domain([0, data.length]).clamp(false).copy(); // Zoom in a little to hide indicator preroll
-
-                yInit = y.copy();
-                yPercentInit = yPercent.copy();
-                draw();
-
-                t = d3.zoomTransform(svg.node());
-
-
-            }
-            setTimeout(() => {
-                newData()
-            }, 800);
-
-
-
             this.interval = setInterval(() => {
                 this.$socket.client.emit('getKlines');
-
-                var accessor = candlestick.accessor(),
-                    indicatorPreRoll = 33; // Don't show where indicators don't have data
+                var accessor = candlestick.accessor();
 
                 let data = this.data.map(function(d) {
                     const timestamp = (new Date(d[0]))
@@ -458,12 +397,21 @@ export default {
                 }).sort(function(a, b) {
                     return d3.ascending(accessor.d(a), accessor.d(b));
                 });
+
+
+
+
+                x.domain(techan.scale.plot.time(data).domain()).zoomable();
+                y.domain(techan.scale.plot.ohlc(data).domain());
+                yPercent.domain(techan.scale.plot.percent(y, accessor(data)).domain());
+                yVolume.domain(techan.scale.plot.volume(data).domain())
 
                 var macdData = techan.indicator.macd()(data);
                 macdScale.domain(techan.scale.plot.macd(macdData).domain());
                 var rsiData = techan.indicator.rsi()(data);
                 var rsiStochData = JSON.parse(JSON.stringify(rsiData));
                 rsiScale.domain(techan.scale.plot.rsi(rsiData).domain());
+                rsiStochScale.domain(techan.scale.plot.rsi(rsiStochData).domain());
 
                 let collection = [];
                 const period = 50;
@@ -482,12 +430,6 @@ export default {
                     }
                 }
 
-                rsiStochScale.domain(techan.scale.plot.rsi(rsiStochData).domain());
-                x.domain(techan.scale.plot.time(data).domain()).zoomable()
-                svg.call(zoom.transform, t);
-
-                draw()
-
                 svg.select("g.candlestick").datum(data).call(candlestick)
                 svg.select("g.close.annotation").datum([data[data.length - 1]]).call(closeAnnotation);
                 svg.select("g.volume").datum(data).call(volume);
@@ -497,26 +439,38 @@ export default {
                 svg.select("g.macd .indicator-plot").datum(macdData).call(macd);
                 svg.select("g.rsi .indicator-plot").datum(rsiData).call(rsi);
                 svg.select("g.rsiStoch .indicator-plot").datum(rsiStochData).call(rsiStoch);
-
                 svg.select("g.crosshair.ohlc").call(ohlcCrosshair)
                 svg.select("g.crosshair.macd").call(macdCrosshair)
                 svg.select("g.crosshair.rsi").call(rsiCrosshair)
+
+                draw()
+
+                if (!t) {
+                    zoomableInit = x.zoomable().domain([0, data.length]).clamp(false).copy(); 
+                    t = d3.zoomTransform(svg.node());
+                    yPercentInit = yPercent.copy();
+                    yInit = y.copy();
+                }
+                let smaLength = techan.indicator.sma().period(21)(data).length - 1;
+                document.title =  data[data.length-1].close.toFixed(4) + " | Boca";
+                this.$store.commit('updatePrice', data[data.length-1].close)
+                this.$store.commit('updateMacD', macdData[macdData.length-1].macd)
+                this.$store.commit('updateRsi', rsiData[rsiData.length - 1].rsi)
+                this.$store.commit('updateStoch', rsiStochData[rsiStochData.length - 1].rsi)
+                this.$store.commit('updateEma1', (techan.indicator.sma().period(21)(data)[smaLength].value))
+
+                svg.call(zoom.transform, t);
+
             }, 1000);
-
-
 
             function zoomed() {
                 x.zoomable().domain(d3.event.transform.rescaleX(zoomableInit).domain());
                 y.domain(d3.event.transform.rescaleY(yInit).domain());
                 yPercent.domain(d3.event.transform.rescaleY(yPercentInit).domain());
                 t = d3.zoomTransform(svg.node());
-
                 draw();
             }
 
-
-
-            // gridlines in y axis function
             function make_y_gridlines() {
                 return d3.axisLeft(y)
                     .ticks(5)
@@ -553,6 +507,7 @@ export default {
     },
     beforeDestroy() {
         clearInterval(this.interval);
+        document.title = "Boca";
     },
     mounted() {
         //this.sendMessage()

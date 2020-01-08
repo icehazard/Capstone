@@ -1,12 +1,12 @@
 <template>
 <v-container fluid class="py-0">
     <v-layout wrap row>
-        <v-flex xs12 md9 lg10>
+        <v-flex xs12 md9 lg9>
             <div class="top-section">
                 <GraphOG></GraphOG>
             </div>
         </v-flex>
-        <v-flex xs6 md3 lg2>
+        <v-flex xs6 md3 lg3>
             <div class="top-section "><Panel></Panel></div>
         </v-flex>
         <!-- <v-flex xs6 md12>
