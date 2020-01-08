@@ -47,20 +47,16 @@ mongo.connect(key.mongo, { useNewUrlParser: true }, function(err, db) {
       socket.emit("getAssets", b);
     });
 
-    socket.on("sell", async function() {
-      console.log("sell");
-      let a = await client.accountInfo();
-      let b = a.balances.filter(item => {
-        return item.asset === "IOTA";
-      });
-      let crypto = (parseFloat(b[0].free) * 0.99).toFixed(2);
-
-      console.log(crypto);
-
-      console.log(
+    socket.on("sell", async function(dump) {
+      // console.log("sell");
+      // let a = await client.accountInfo();
+      // let b = a.balances.filter(item => {
+      //   return item.asset === "IOTA";
+      // });
+      let crypto = (parseFloat(dump.asset) * 0.99).toFixed(2);
         await client
           .order({
-            symbol: "IOTAUSDT",
+            symbol: dump.symbol,
             side: "SELL",
             quantity: crypto,
             type: "MARKET"
@@ -68,43 +64,31 @@ mongo.connect(key.mongo, { useNewUrlParser: true }, function(err, db) {
           .catch(error => {
             console.log(error);
           })
-      );
-
       socket.emit("sell", crypto);
     });
 
-    socket.on("buy", async function() {
-      console.log("buy");
-      let a = await client.accountInfo();
-      let b = a.balances.filter(item => {
-        return item.asset === "USDT";
-      });
-      let usdt = b[0].free;
-
-      console.log(usdt);
-
-      let getPrice = await client.prices();
-
-      let asset = "IOTAUSDT";
-      let toBuy = (usdt / getPrice[asset]) * 0.99;
-
-      toBuy = toBuy.toFixed(2);
-
-      console.log(toBuy);
-
-      console.log(
-        await client
-          .order({
-            symbol: asset,
-            side: "BUY",
-            quantity: toBuy,
-            type: "MARKET"
-          })
-          .catch(error => {
-            console.log(error);
-          })
-      );
-
+    socket.on("buy", async function(dump) {
+      // console.log("buy");
+      // let a = await client.accountInfo();
+      // let b = a.balances.filter(item => {
+      //   return item.asset === "USDT";
+      // });
+      // let usdt = b[0].free;
+     // console.log(dump)
+      // let getPrice = await client.prices();
+      //let asset = "IOTAUSDT";
+      // let toBuy = (usdt / getPrice[asset]) * 0.99;
+      // toBuy = toBuy.toFixed(2);
+      let amount = (dump.usdt / dump.price * 0.99).toFixed(2)
+      await client.order({
+          symbol: dump.symbol,
+          side: "BUY",
+          quantity: amount,
+          type: "MARKET"
+        })
+        .catch(error => {
+          console.log(error);
+        });
       socket.emit("buy", "LONG");
     });
   });
