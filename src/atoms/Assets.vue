@@ -43,6 +43,7 @@ export default {
       });
       let usdt = b[0].free;
       let crypto = c[0].free;
+      console.log(crypto)
        this.$store.commit('updateUsdt', parseFloat(b[0].free))
        this.$store.commit('updateAssetPrice', parseFloat(c[0].free))
     },

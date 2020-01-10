@@ -3,6 +3,7 @@
     <v-layout wrap row>
         <v-flex xs12 md9 lg9>
             <div class="top-section">
+                <Toolbar></Toolbar>
                 <GraphOG></GraphOG>
             </div>
         </v-flex>
@@ -22,13 +23,15 @@ import HelloWorld from "../components/HelloWorld";
 import Graph from '../components/Graph';
 import GraphOG from '../components/GraphOG';
 import Panel from "../components/Panel";
+import Toolbar from "../atoms/timeFrameToolbar";
 
 export default {
     components: {
         HelloWorld,
         Graph,
         GraphOG,
-        Panel
+        Panel,
+        Toolbar
     },
     sockets: {
       connect() {

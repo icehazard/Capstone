@@ -27,7 +27,7 @@ mongo.connect(key.mongo, { useNewUrlParser: true }, function(err, db) {
 
     socket.on("getKlines", function(data) {
       let time = data;
-      fetch("https://api.binance.com/api/v1/klines?symbol=IOTAUSDT&interval=5m")
+      fetch("https://api.binance.com/api/v1/klines?symbol=IOTAUSDT&interval=" + data )
         .then(resp => resp.json())
         .then(info => {
           socket.emit("getKlines", info);
@@ -54,33 +54,43 @@ mongo.connect(key.mongo, { useNewUrlParser: true }, function(err, db) {
       //   return item.asset === "IOTA";
       // });
       let crypto = (parseFloat(dump.asset) * 0.99).toFixed(2);
-        await client
-          .order({
-            symbol: dump.symbol,
-            side: "SELL",
-            quantity: crypto,
-            type: "MARKET"
-          })
-          .catch(error => {
-            console.log(error);
-          })
+
+      // console
+      //   .log(
+      //     await client.order({
+      //       symbol: dump.symbol,
+      //       type: "STOP_LOSS_LIMIT",
+      //       quantity: crypto,
+      //       side: "SELL",
+      //       price: 0.1779
+      //     })
+      //   )
+      //   .catch(error => {
+      //     console.log(error);
+      //   });
+
+      console.log(crypto)
+
+      await client
+        .order({
+          symbol: dump.symbol,
+          side: "SELL",
+          quantity: crypto,
+          type: "MARKET"
+        })
+        .catch(error => {
+          console.log(error);
+        })
+
+        
       socket.emit("sell", crypto);
     });
 
     socket.on("buy", async function(dump) {
-      // console.log("buy");
-      // let a = await client.accountInfo();
-      // let b = a.balances.filter(item => {
-      //   return item.asset === "USDT";
-      // });
-      // let usdt = b[0].free;
-     // console.log(dump)
-      // let getPrice = await client.prices();
-      //let asset = "IOTAUSDT";
-      // let toBuy = (usdt / getPrice[asset]) * 0.99;
-      // toBuy = toBuy.toFixed(2);
-      let amount = (dump.usdt / dump.price * 0.99).toFixed(2)
-      await client.order({
+
+      let amount = ((dump.usdt / dump.price) * 0.99).toFixed(2);
+      await client
+        .order({
           symbol: dump.symbol,
           side: "BUY",
           quantity: amount,

@@ -11,10 +11,11 @@ export default new Vuex.Store({
     rsi: 0,
     stoch: 0,
     ema1: 0,
-    timeFrame: "",
+    timeFrame: "5m",
     usdt: 0,
     symbol: "IOTAUSDT",
-    assetPrice: 0
+    assetPrice: 0,
+    stoploss: 0
   },
   getters: {
     doneTodos: state => {
@@ -40,11 +41,14 @@ export default new Vuex.Store({
     updateUsdt(state, n){
       state.usdt = n;
     },
-    updateTimefram(state, n){
+    updateTimeframe(state, n){
       state.timeFrame = n;
     },
     updateAssetPrice(state, n){
       state.assetPrice = n;
+    },
+    updateStopLoss(state, n){
+      state.stoploss = n;
     },
   },
   actions: {

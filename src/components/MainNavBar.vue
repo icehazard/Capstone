@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar  app >
+  <v-app-bar  dense app >
     <v-toolbar-items class="hidden-xs-only">
       <v-btn depressed to="/" color="transparent" class="no-shadow">
         <span class="font-weight-light">Cryptrader</span>
