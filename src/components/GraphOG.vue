@@ -427,7 +427,7 @@ export default {
 				rsiStochScale.domain(techan.scale.plot.rsi(rsiStochData).domain());
 
 				let collection = [];
-				const period = 50;
+				const period = 25;
 				let highest, lowest, stochRSI;
 
 				for (let i in rsiStochData) {
@@ -465,7 +465,7 @@ export default {
 					yInit = y.copy();
 				}
 				let smaLength = techan.indicator.sma().period(21)(data).length - 1;
-				document.title = data[data.length - 1].close.toFixed(4) + " | Boca";
+				document.title = data[data.length - 1].close.toFixed(4) + " | Boca | " + Math.round(rsiStochData[rsiStochData.length - 1].rsi);
 				this.$store.commit('updatePrice', Number(data[data.length - 1].close))
 				this.$store.commit('updateMacD', macdData[macdData.length - 1].macd)
 				this.$store.commit('updateRsi', rsiData[rsiData.length - 1].rsi)

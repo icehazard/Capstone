@@ -4,7 +4,7 @@
       <v-flex>
         <v-card class="ma-1">
           <v-card-text class="pa-2">
-            Bought
+            {{ boughtLable }}
           </v-card-text>
           <v-card-text class="pa-2">
             {{ bought }}
@@ -49,7 +49,17 @@
         <v-card class="ma-1">
           <v-card-text class="pa-2"> </v-card-text>
           <v-card-text class="pa-2">
-            <v-slider v-model="stop" class="stoploss" max="5" step="0.5" label="Stop" :thumb-size="24" thumb-label="always" ticks
+            <v-slider
+              always-dirty
+              :disabled="modify"
+              v-model="target"
+              class=""
+              max="2"
+              ticks="always"
+              step="0.2"
+              label="Target"
+              :thumb-size="24"
+              thumb-label="always"
               ><template v-slot:prepend>
                 <v-icon>
                   mdi-minus
@@ -62,7 +72,8 @@
                 </v-icon>
               </template></v-slider
             >
-            <v-slider v-model="target" class="" max="5" step="0.5" label="Target" :thumb-size="24" thumb-label="always" ticks
+
+            <v-slider :disabled="modify" v-model="stop" class="stoploss" max="2" step="0.2" label="Stop" :thumb-size="24" thumb-label="always" ticks="always"
               ><template v-slot:prepend>
                 <v-icon>
                   mdi-minus
@@ -98,17 +109,44 @@ export default {
     }
   },
   computed: {
+    boughtLable() {
+      return this.idlePosition ? "Bought" : "Sold";
+    },
+    tradeStopOrder() {
+      return this.$store.state.tradeStopOrder;
+    },
+    tradelimitOrder() {
+      return this.$store.state.tradelimitOrder;
+    },
+    idlePosition() {
+      return this.$store.state.idlePosition;
+    },
+    modify() {
+      return this.$store.state.modifyTrade;
+    },
     price() {
       return this.$store.state.price;
     },
     stopPercent() {
-      return (this.price - (this.stop / 100) * this.price).toFixed(4);
+      if (this.idlePosition && this.tradeStopOrder != 0 && this.modify) {
+        return this.tradeStopOrder;
+      } else {
+        let stop = (this.price - (this.stop / 100) * this.price).toFixed(4);
+        this.$store.commit("updateStopLoss", stop);
+        return stop;
+      }
     },
     targetPercent() {
-      return (this.price + (this.target / 100) * this.price).toFixed(4);
+      if (this.idlePosition && this.tradeStopOrder != 0 && this.modify) {
+        return this.tradelimitOrder;
+      } else {
+        let targetP = (this.price + (this.target / 100) * this.price).toFixed(4);
+        this.$store.commit("updateTargetPrice", targetP);
+        return targetP;
+      }
     },
     difference() {
-      return  (this.price && this.bought) != 0 ? (100 * (this.price - this.bought) / ((this.price + this.bought) / 2)).toFixed(2) : 0;
+      return (this.price && this.bought) != 0 ? ((100 * (this.price - this.bought)) / ((this.price + this.bought) / 2)).toFixed(2) : 0;
     }
   }
 };

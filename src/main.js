@@ -6,10 +6,12 @@ import './registerServiceWorker'
 import vuetify from './plugins/vuetify';
 import io from 'socket.io-client';
 import VueSocketio from 'vue-socket.io-extended';
+import VueResource from 'vue-resource';
 
 
-Vue.use(VueSocketio, io('http://192.168.1.36:3000'));
+Vue.use(VueSocketio, io('http://127.0.0.1:3000'));
 Vue.config.productionTip = false
+Vue.use(VueResource)
 
 new Vue({
   router,

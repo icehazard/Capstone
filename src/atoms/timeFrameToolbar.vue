@@ -1,6 +1,6 @@
 <template>
   <v-toolbar text dense color="rgb(41,41,41)">
-    <v-btn-toggle v-model="toggle_exclusive" dense mandatory>
+    <v-btn-toggle v-model="toggle_exclusive"  mandatory>
       <v-btn value="1m">
         <span>1m</span>
       </v-btn>

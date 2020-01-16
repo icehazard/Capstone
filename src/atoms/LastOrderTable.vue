@@ -11,24 +11,10 @@ export default {
   sockets: {
     lastOrder(val) {
       val = val.slice(val.length - 4, val.length).reverse();
-      var jsonString = JSON.stringify(val, replacer);
-
-      function replacer(key, value) {
-        if (key === "isBuyer") {
-          return value ? "Buy" : "Sell";
-        }
-        if (key === "qty" || key === "quoteQty") {
-          return Number(value).toFixed(4);
-        }
-        if (typeof value === "boolean") {
-          return String(value);
-        }
-        if (typeof value === "string" && key == "price") {
-          return Number(value).toFixed(4);
-        }
-        return value;
-      }
+      this.$store.commit("updateidlePosition", val[0].isBuyer);
+      var jsonString = JSON.stringify(val, this.replacer);
       this.data = JSON.parse(jsonString);
+      this.toDisable(this.data);
     }
   },
   data() {
@@ -41,6 +27,29 @@ export default {
       ],
       data: []
     };
+  },
+  methods: {
+    toDisable(val) {
+      if (val[0].isBuyer == "Sell") {
+        console.log("TCL: toDisable -> val[0].isBuyer", val[0].isBuyer)
+        this.$store.commit("updatemodifyTrade", false);      
+      }
+    },
+    replacer(key, value) {
+      if (key === "isBuyer") {
+        return value ? "Buy" : "Sell";
+      }
+      if (key === "qty" || key === "quoteQty") {
+        return Number(value).toFixed(4);
+      }
+      if (typeof value === "boolean") {
+        return String(value);
+      }
+      if (typeof value === "string" && key == "price") {
+        return Number(value).toFixed(4);
+      }
+      return value;
+    }
   },
   mounted() {
     this.$socket.client.emit("lastOrder");

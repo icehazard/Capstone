@@ -204,12 +204,6 @@ export default {
 				y.domain(techan.scale.plot.ohlc(data.slice(0, data.length)).domain());
 				yVolume.domain(techan.scale.plot.volume(data.slice(0, data.length)).domain());
 
-
-
-				
-				//console.log(zoom.transform)
-				console.log(t)
-
 				svg.select('g.x.axis').call(xAxis);
 				svg.select('g.y.axis').call(yAxis);
 				svg.select("g.volume.axis").call(volumeAxis);

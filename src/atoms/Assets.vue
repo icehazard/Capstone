@@ -28,11 +28,15 @@ export default {
   },
   mounted() {
     this.$socket.client.emit("getAssets");
+
+    
   },
   sockets: {
-    lastOrder(val) {
-      this.trades = val;
-    },
+    // lastOrder(val) {
+    //   this.trades = val;
+    //   console.log("TCL: lastOrder -> val", val)
+      
+    // },
     getAssets(val) {
       this.assets = val;
       let b = val.filter(item => {
@@ -43,7 +47,6 @@ export default {
       });
       let usdt = b[0].free;
       let crypto = c[0].free;
-      console.log(crypto)
        this.$store.commit('updateUsdt', parseFloat(b[0].free))
        this.$store.commit('updateAssetPrice', parseFloat(c[0].free))
     },

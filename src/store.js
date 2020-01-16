@@ -1,7 +1,13 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from "vue";
+import Vuex from "vuex";
+import VuexPersist from "vuex-persist";
 
-Vue.use(Vuex)
+Vue.use(Vuex);
+
+const vuexPersist = new VuexPersist({
+  key: "my-app",
+  storage: window.localStorage
+});
 
 export default new Vuex.Store({
   state: {
@@ -15,45 +21,62 @@ export default new Vuex.Store({
     usdt: 0,
     symbol: "IOTAUSDT",
     assetPrice: 0,
-    stoploss: 0
+    stoploss: 0,
+    targetPrice: 0,
+    idlePosition: false,
+    modifyTrade: false,
+    tradeStopOrder: 0,
+    tradelimitOrder: 0
   },
   getters: {
     doneTodos: state => {
       return state.todos.filter(todo => todo.done);
-  },
+    }
   },
   mutations: {
-    updatePrice(state, n){
+    updatetradeStopOrder(state, n) {
+      state.tradeStopOrder = n;
+    },
+    updatetradelimitOrder(state, n) {
+      state.tradelimitOrder = n;
+    },
+    updatemodifyTrade(state, n) {
+      state.modifyTrade = n;
+    },
+    updateidlePosition(state, n) {
+      state.idlePosition = n;
+    },
+    updatePrice(state, n) {
       state.price = n;
     },
-    updateMacD(state, n){
+    updateMacD(state, n) {
       state.macD = n;
     },
-    updateRsi(state, n){
+    updateRsi(state, n) {
       state.rsi = n;
     },
-    updateStoch(state, n){
+    updateStoch(state, n) {
       state.stoch = n;
     },
-    updateEma1(state, n){
+    updateEma1(state, n) {
       state.ema1 = n;
     },
-    updateUsdt(state, n){
+    updateUsdt(state, n) {
       state.usdt = n;
     },
-    updateTimeframe(state, n){
+    updateTimeframe(state, n) {
       state.timeFrame = n;
     },
-    updateAssetPrice(state, n){
+    updateAssetPrice(state, n) {
       state.assetPrice = n;
     },
-    updateStopLoss(state, n){
+    updateStopLoss(state, n) {
       state.stoploss = n;
     },
+    updateTargetPrice(state, n) {
+      state.targetPrice = n;
+    }
   },
-  actions: {
-
-  },
-
-})
-
+  actions: {},
+   plugins: [vuexPersist.plugin]
+});
