@@ -31,7 +31,6 @@ export default {
   methods: {
     toDisable(val) {
       if (val[0].isBuyer == "Sell") {
-        console.log("TCL: toDisable -> val[0].isBuyer", val[0].isBuyer)
         this.$store.commit("updatemodifyTrade", false);      
       }
     },

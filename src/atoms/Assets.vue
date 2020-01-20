@@ -1,13 +1,15 @@
 <template>
   <v-layout mt-3 class="asset_panel">
-    <v-card class="ma-1" v-for="asset in assets" :key="asset.asset">
-      <v-card-text class="pa-2">
+    <section class="ma-1" v-for="asset in assets" :key="asset.asset">
+       <v-card >
+      <v-card-text  class="pa-2">
         {{ asset.asset }}
       </v-card-text>
       <v-card-text class="pa-2">
         {{ asset.free | fix }}
       </v-card-text>
     </v-card>
+    </section>
   </v-layout>
 </template>
 
@@ -32,11 +34,6 @@ export default {
     
   },
   sockets: {
-    // lastOrder(val) {
-    //   this.trades = val;
-    //   console.log("TCL: lastOrder -> val", val)
-      
-    // },
     getAssets(val) {
       this.assets = val;
       let b = val.filter(item => {

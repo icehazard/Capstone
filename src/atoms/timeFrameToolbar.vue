@@ -1,6 +1,6 @@
 <template>
   <v-toolbar text dense color="rgb(41,41,41)">
-    <v-btn-toggle v-model="toggle_exclusive"  mandatory>
+    <v-btn-toggle v-model="toggle_exclusive" mandatory>
       <v-btn value="1m">
         <span>1m</span>
       </v-btn>
@@ -9,6 +9,9 @@
       </v-btn>
       <v-btn value="15m">
         <span>15m</span>
+      </v-btn>
+      <v-btn value="1h">
+        <span>1h</span>
       </v-btn>
       <v-btn value="4h">
         <span>4h</span>
@@ -21,29 +24,75 @@
       </v-btn>
     </v-btn-toggle>
     <div>
-      <v-text-field dense filled placeholder="IOTAUSDT" class="mt-2 ml-3"></v-text-field>
+      <v-text-field
+        @click="showpanel"
+        dense
+        filled
+        v-on:keyup.enter="changeSymbol"
+        v-on:keyup="showpanel"
+        v-model="symbolText"
+        :placeholder="this.symbol"
+        autocomplete="off"
+        class="mt-2 ml-3 toggle_trading_panel"
+      ></v-text-field>
     </div>
-    <v-btn text class="ml-1 pt-0"><v-icon>mdi-magnify</v-icon></v-btn>
+    <v-btn @click="changeSymbol" text class="ml-1 pt-0 toggle_trading_panel"><v-icon>mdi-magnify</v-icon></v-btn>
   </v-toolbar>
 </template>
 
 <script>
 export default {
- data () {
+  data() {
     return {
-      toggle_exclusive: "5m",
-    }
- },
- // computed: {
- //    timeFrame () {
- //      return this.$store.state.timeFrame;
- //    },
-  // },
-   watch: {
-    toggle_exclusive: function (newVal) {
-      this.$store.commit('updateTimeframe', newVal)
+      toggle_exclusive: null,
+      symbolText: "IOTAUSDT"
+    };
+  },
+  methods: {
+    showpanel() {
+      this.$store.commit("updatesSowTradingPairPanel", true);
+    },
+    hidepanel() {
+      this.$store.commit("updatesSowTradingPairPanel", false);
+    },
+    changeSymbol() {
+      this.$store.commit("updatesymbol", this.symbolText);
     }
   },
+  computed: {
+    timeFrame() {
+      return this.$store.state.timeFrame;
+    },
+    symbol() {
+      return this.$store.state.symbol;
+    },
+  },
+  watch: {
+    toggle_exclusive: function(newVal) {
+      this.$store.commit("updateTimeframe", newVal);
+    },
+    symbolText(val){
+    this.$store.commit("updatesSearchTradingPairPanel", val);
+    },
+    symbol(val){
+      this.symbolText = val;
+    }
+
+  },
+  beforeMount() {
+    this.toggle_exclusive = this.timeFrame;
+    this.symbolText = this.symbol;
+  },
+  mounted() {
+    let that = this;
+    document.addEventListener("click",function(event) {
+        if (!event.target.closest(".toggle_trading_panel")) {
+          that.hidepanel();
+        } 
+      },
+      false
+    );
+  }
 };
 </script>
 

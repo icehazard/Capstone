@@ -32,7 +32,6 @@ export default {
 <style lang="less" scoped>
 .asset_panel {
   padding: 14px;
-  height: 124px;
   background-color: rgb(49, 49, 49);
 }
 

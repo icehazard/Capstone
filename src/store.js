@@ -5,7 +5,7 @@ import VuexPersist from "vuex-persist";
 Vue.use(Vuex);
 
 const vuexPersist = new VuexPersist({
-  key: "my-app",
+  key: "vuex",
   storage: window.localStorage
 });
 
@@ -26,14 +26,20 @@ export default new Vuex.Store({
     idlePosition: false,
     modifyTrade: false,
     tradeStopOrder: 0,
-    tradelimitOrder: 0
-  },
-  getters: {
-    doneTodos: state => {
-      return state.todos.filter(todo => todo.done);
-    }
+    tradelimitOrder: 0,
+    showTradingPairPanel: false,
+    searchTradingPairPanel: ''
   },
   mutations: {
+    updatesSearchTradingPairPanel(state, n) {
+      state.searchTradingPairPanel = n;
+    },
+    updatesSowTradingPairPanel(state, n) {
+      state.showTradingPairPanel = n;
+    },
+    updatesymbol(state, n) {
+      state.symbol = n;
+    },
     updatetradeStopOrder(state, n) {
       state.tradeStopOrder = n;
     },
