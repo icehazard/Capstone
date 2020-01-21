@@ -1,42 +1,36 @@
-exports.myDateTime = function (io) {
-  io.on("connection", async function(socket) {
+exports.socketFunctions = function (io, client) {
+  io.on("connection", async function (socket) {
     console.log(socket.id, "has connected!");
 
-    socket.on("pairs", async function(dump) {
-      let res = await client.dailyStats()
+    socket.on("pairs", async function (dump) {
+      let res = await client.dailyStats();
       socket.emit("pairs", res);
-    })
+    });
 
-    
-    socket.on("openOrders", async function(dump) {
+    socket.on("openOrders", async function (dump) {
       let res = await client.openOrders({
-        symbol: 'IOTAUSDT',
-      })
+        symbol: "IOTAUSDT"
+      });
 
       socket.emit("openOrders", res);
+    });
 
-    })
-
-    socket.on("oco", async function(dump) {
-      console.log("OCO")
-      console.log(dump)
+    socket.on("oco", async function (dump) {
+      console.log("OCO");
       let quantity = (parseFloat(dump.asset) * 0.99).toFixed(2);
-      let price = dump.target
-      let burl = 'https://api.binance.com';
-      let endPoint = '/api/v3/order/oco';
-      let param = '&symbol=IOTAUSDT&side=SELL&quantity=' + quantity + '&price='+ price + '&stopPrice='+ (parseFloat(dump.stoploss)+0.0001).toFixed(4) +'&stopLimitPrice=' + dump.stoploss + '&stopLimitTimeInForce=GTC&';
-      let dataQueryString = 'recvWindow=20000&timestamp=' + Date.now() + param;     
-      let signature = CryptoJS.HmacSHA256(dataQueryString ,key.apiSecret).toString(CryptoJS.enc.Hex);
-     
-      let url = burl + endPoint + '?'  + dataQueryString + '&signature=' + signature ; 
-      console.log(url)
-      let res = await fetch(url,  {method: "POST", headers: { 'X-MBX-APIKEY': key.apiKey }})
-      res = await res.json()
-      console.log(res)
+      let price = dump.target;
+      let burl = "https://api.binance.com";
+      let endPoint = "/api/v3/order/oco";
+      let param = "&symbol=IOTAUSDT&side=SELL&quantity=" + quantity + "&price=" + price + "&stopPrice=" + (parseFloat(dump.stoploss) + 0.0001).toFixed(4) + "&stopLimitPrice=" + dump.stoploss + "&stopLimitTimeInForce=GTC&";
+      let dataQueryString = "recvWindow=20000&timestamp=" + Date.now() + param;
+      let signature = CryptoJS.HmacSHA256(dataQueryString, key.apiSecret).toString(CryptoJS.enc.Hex);
+      let url = burl + endPoint + "?" + dataQueryString + "&signature=" + signature;
+      let res = await fetch(url, { method: "POST", headers: { "X-MBX-APIKEY": key.apiKey } });
+      res = await res.json();
       socket.emit("oco", res);
-    })
+    });
 
-    socket.on("stoploss", async function(dump) {
+    socket.on("stoploss", async function (dump) {
       console.log(
         await client
           .order({
@@ -53,21 +47,21 @@ exports.myDateTime = function (io) {
       );
     });
 
-    socket.on("getKlines", function(data) {
+    socket.on("getKlines", function (data) {
       let time = data;
       fetch("https://api.binance.com/api/v1/klines?symbol=" + data.symbol + "&interval=" + data.timeframe)
         .then(resp => resp.json())
         .then(info => {
-          socket.emit("getKlines", {data: info, timeframe: data.timeframe});
+          socket.emit("getKlines", { data: info, timeframe: data.timeframe });
         });
     });
 
-    socket.on("lastOrder", async function() {
+    socket.on("lastOrder", async function () {
       let account = await client.myTrades({ symbol: "IOTAUSDT", limit: "10" });
       socket.emit("lastOrder", account);
     });
 
-    socket.on("getAssets", async function() {
+    socket.on("getAssets", async function () {
       let a = await client.accountInfo();
       let b = a.balances.filter(item => {
         return item.free > 0 || item.locked > 0;
@@ -75,7 +69,7 @@ exports.myDateTime = function (io) {
       socket.emit("getAssets", b);
     });
 
-    socket.on("sell", async function(dump) {
+    socket.on("sell", async function (dump) {
       let crypto = (parseFloat(dump.asset) * 0.99).toFixed(2);
       await client
         .order({
@@ -91,35 +85,34 @@ exports.myDateTime = function (io) {
       socket.emit("sell", crypto);
     });
 
-    socket.on("buy", async function(dump) {
+    socket.on("buy", async function (dump) {
       let amount = ((dump.usdt / dump.price) * 0.99).toFixed(2);
-      await client
-        .order({
-          symbol: dump.symbol,
-          side: "BUY",
-          quantity: amount,
-          type: "MARKET"
-        })
+      await client.order({
+        symbol: dump.symbol,
+        side: "BUY",
+        quantity: amount,
+        type: "MARKET"
+      })
         .catch(error => {
           console.log(error);
         });
-      socket.emit("buy", {target: dump.target, price: dump.price});
+      socket.emit("buy", { target: dump.target, price: dump.price });
     });
 
-    socket.on("limit", async function(dump) {
+    socket.on("limit", async function (dump) {
       let amount = ((dump.usdt / dump.price) * 0.99).toFixed(2);
-      console.log(await client
-        .order({
-          symbol: dump.symbol,
-          side: "BUY",
-          quantity: amount,
-          type: "LIMIT",
-          price: dump.price,
-          //TimeInForce: "GTC"
-        })
+      console.log(await client.order({
+        symbol: dump.symbol,
+        side: "BUY",
+        quantity: amount,
+        type: "LIMIT",
+        price: dump.price
+        //TimeInForce: "GTC"
+      })
         .catch(error => {
           console.log(error);
-        }));
+        })
+      );
       socket.emit("buy", "LONG");
     });
   });
