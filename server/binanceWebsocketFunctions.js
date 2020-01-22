@@ -1,7 +1,10 @@
-exports.socketFunctions = function (io, client) {
-  io.on("connection", async function (socket) {
-    console.log(socket.id, "has connected!");
+const key = require("./keys.js");
+const Binance = require("binance-api-node").default;
+const client = Binance({ apiKey: key.apiKey, apiSecret: key.apiSecret });
+let CryptoJS = require("crypto-js");
+const fetch = require("node-fetch");
 
+exports.socketFunctions = function ( socket) {
     socket.on("pairs", async function (dump) {
       let res = await client.dailyStats();
       socket.emit("pairs", res);
@@ -115,5 +118,4 @@ exports.socketFunctions = function (io, client) {
       );
       socket.emit("buy", "LONG");
     });
-  });
 };

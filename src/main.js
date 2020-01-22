@@ -8,8 +8,13 @@ import io from 'socket.io-client';
 import VueSocketio from 'vue-socket.io-extended';
 import VueResource from 'vue-resource';
 
+const socket = io('http://127.0.0.1:3000', {
+  query: {
+    token: store.state.token
+  }
+});
 
-Vue.use(VueSocketio, io('http://127.0.0.1:3000'));
+Vue.use(VueSocketio, socket);
 Vue.config.productionTip = false
 Vue.use(VueResource)
 
@@ -18,4 +23,5 @@ new Vue({
   store,
   vuetify,
   render: h => h(App)
-}).$mount('#app')
+  
+}).$mount('#app')  

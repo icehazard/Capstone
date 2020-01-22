@@ -9,11 +9,15 @@
     "start": "concurrently \"cd server && nodemon server.js \" \"yarn serve\""
   },
   "dependencies": {
+    "@hapi/joi": "^17.1.0",
+    "bcryptjs": "^2.4.3",
     "binance": "^1.3.3",
     "binance-api-node": "^0.9.6",
     "concurrently": "^5.0.0",
     "core-js": "^2.6.5",
     "crypto-js": "^3.1.9-1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.8.9",
     "path": "^0.12.7",
     "register-service-worker": "^1.6.2",
     "serialize-javascript": "^2.1.2",

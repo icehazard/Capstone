@@ -28,9 +28,17 @@ export default new Vuex.Store({
     tradeStopOrder: 0,
     tradelimitOrder: 0,
     showTradingPairPanel: false,
-    searchTradingPairPanel: ''
+    searchTradingPairPanel: '',
+    token: '',
+    email: ''
   },
   mutations: {
+    updatesEmail(state, n) {
+      state.email = n;
+    },
+    updatesToken(state, n) {
+      state.token = n;
+    },
     updatesSearchTradingPairPanel(state, n) {
       state.searchTradingPairPanel = n;
     },

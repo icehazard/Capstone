@@ -53,7 +53,7 @@ export default {
       this.$store.commit("updatesSowTradingPairPanel", true);
     },
     hidepanel() {
-      this.$store.commit("updatesSowTradingPairPanel", false);
+     this.$store.commit("updatesSowTradingPairPanel", false);
     },
     changeSymbol() {
       this.$store.commit("updatesymbol", this.symbolText);
@@ -85,6 +85,7 @@ export default {
   },
   mounted() {
     let that = this;
+    //this even listner needs to be destroyed
     document.addEventListener("click",function(event) {
         if (!event.target.closest(".toggle_trading_panel")) {
           that.hidepanel();

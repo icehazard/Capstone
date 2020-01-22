@@ -538,7 +538,7 @@ export default {
 
           svg.call(zoom.transform, t);
         }
-      }, 5000);
+      }, 500);
 
       function zoomed() {
         x.zoomable().domain(d3.event.transform.rescaleX(zoomableInit).domain());
