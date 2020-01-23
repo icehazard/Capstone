@@ -26,7 +26,9 @@ export default {
       this.disableSlider = !this.disableSlider;
       this.$store.commit("updatemodifyTrade", this.disableSlider);
       if (!this.disableSlider) return;
-      if (this.price != this.target && this.modifyTrade && !this.disableSlider ) {
+       console.log("TCL: modify -> this.modifyTrade", this.modifyTrade)
+      if (this.price != this.target && this.modifyTrade && this.disableSlider ) {
+       
         console.log("oco");
         this.$socket.client.emit("oco", {
           price: this.price,
@@ -53,8 +55,10 @@ export default {
   },
   sockets: {
     buy(val) {
+      console.log("Step one Buy")
       setTimeout(() => {
         if (val.target != val.price) {
+          console.log("Step two OCO")
           this.$socket.client.emit("oco", {
             price: this.price,
             usdt: this.usdt,
@@ -64,6 +68,7 @@ export default {
             target: this.target
           });
         } else {
+          console.log("Step three stoploss")
           this.$socket.client.emit("stoploss", {
             price: this.price,
             usdt: this.usdt,
@@ -76,14 +81,14 @@ export default {
       }, 2000);
 
       this.$socket.client.emit("getAssets");
-      this.$socket.client.emit("lastOrder");
+      this.$socket.client.emit("lastOrder", {symbol: this.$store.state.symbol});
       this.$store.commit("updatemodifyTrade", true);
       this.$socket.client.emit("openOrders", { symbol: this.symbol });
     },
     sell(val) {
       this.$store.commit("updatemodifyTrade", false);
       this.$socket.client.emit("getAssets");
-      this.$socket.client.emit("lastOrder");
+      this.$socket.client.emit("lastOrder", {symbol: this.$store.state.symbol});
     },
     openOrders(val) {
       for (let x in val) {
@@ -135,7 +140,7 @@ export default {
     price(val) {
       if (val >= this.tradelimitOrder || val <= this.tradeStopOrder) {
         setTimeout(() => {
-          this.$socket.client.emit("lastOrder");
+          this.$socket.client.emit("lastOrder", {symbol: this.$store.state.symbol});
           this.$socket.client.emit("getAssets");
         }, 2000);
       }

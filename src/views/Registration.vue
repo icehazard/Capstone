@@ -45,6 +45,7 @@ export default {
         this.$socket.client.connect();
         this.email = "";
         this.password = "";
+        this.$router.push("/")
         console.log("TCL: registration -> val.success", val);
       }
 

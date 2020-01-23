@@ -23,6 +23,8 @@ export default {
    handleClick(a){
     this.$store.commit("updatesymbol",a.symbol);
     this.$store.commit("updatesSowTradingPairPanel", false);
+     this.$socket.client.emit("lastOrder", {symbol: this.$store.state.symbol});
+     console.log("TCL: handleClick ->  this.$store.state.symbol",  this.$store.state.symbol)
    }
   },
   computed: {

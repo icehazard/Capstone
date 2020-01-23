@@ -11,6 +11,7 @@ export default {
   sockets: {
     lastOrder(val) {
       val = val.slice(val.length - 4, val.length).reverse();
+      if(!val[0]) return this.data = [];
       this.$store.commit("updateidlePosition", val[0].isBuyer);
       var jsonString = JSON.stringify(val, this.replacer);
       this.data = JSON.parse(jsonString);
@@ -51,7 +52,7 @@ export default {
     }
   },
   mounted() {
-    this.$socket.client.emit("lastOrder");
+    this.$socket.client.emit("lastOrder", {symbol: this.$store.state.symbol});
   }
 };
 </script>

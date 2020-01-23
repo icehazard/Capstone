@@ -15,7 +15,7 @@
     </v-toolbar-items>
     <v-toolbar-items v-else>
       <v-btn depressed to="profile" color="transparent" class="no-shadow">{{ email }}</v-btn>
-      <v-btn depressed to="/" @click="logOut" color="transparent" class="no-shadow">Logout</v-btn>
+      <v-btn depressed @click="logOut" color="transparent" class="no-shadow">Logout</v-btn>
     </v-toolbar-items>
   </v-app-bar>
 </template>
@@ -35,6 +35,9 @@ export default {
       this.$socket.client.disconnect();
       this.$socket.client.io.opts.query = { token: "" };
       this.$socket.client.connect();
+      this.$router.push("/").catch(err => {console.log("Same Page")})
+      this.$socket.client.emit("lastOrder", {symbol: this.$store.state.symbol});
+      this.$socket.client.emit("getAssets");
       console.log("TCL: logout -> val.success", "Log out");
     }
   }

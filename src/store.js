@@ -19,7 +19,7 @@ export default new Vuex.Store({
     ema1: 0,
     timeFrame: "5m",
     usdt: 0,
-    symbol: "IOTAUSDT",
+    symbol: "BTCUSDT",
     assetPrice: 0,
     stoploss: 0,
     targetPrice: 0,

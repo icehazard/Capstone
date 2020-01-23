@@ -8,7 +8,7 @@
           </div>
           <v-card-text class="pb-0 pt-5">
             <v-text-field v-model="email" label="Email" outlined></v-text-field>
-            <v-text-field v-model="password" label="Password" outlined></v-text-field>
+            <v-text-field v-model="password" label="Password" type="password" outlined></v-text-field>
           </v-card-text>
           <v-card-actions class="pb-4 pt-0 pl-4">
             <v-btn @click="login" color="primary" class="px-5 mr-4 grey--text text--darken-3">Login</v-btn>
@@ -48,7 +48,7 @@ export default {
         this.$socket.client.connect();
         this.email = "";
         this.password = "";
-        console.log("TCL: login -> val.success", val);
+        this.$router.push("/")
       }
 
       if (val.error) console.log(val.error);

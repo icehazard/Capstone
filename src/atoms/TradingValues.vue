@@ -105,6 +105,7 @@ export default {
   sockets: {
     lastOrder(val) {
       let entry = val[val.length - 1];
+      if(!entry) return;
       this.bought = Number(Number(entry.price).toFixed(4));
     }
   },

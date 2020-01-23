@@ -45,7 +45,7 @@ export default {
   data() {
     return {
       toggle_exclusive: null,
-      symbolText: "IOTAUSDT"
+      symbolText: "="
     };
   },
   methods: {
