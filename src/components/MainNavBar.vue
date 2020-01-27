@@ -2,9 +2,11 @@
   <v-app-bar dense app>
     <v-toolbar-items class="hidden-xs-only">
       <v-btn depressed to="/" color="transparent" class="no-shadow">
-        <span class="font-weight-light">Cryptrader</span>
+        <span >Boca</span><span class="font-weight-light">Chica</span>
       </v-btn>
-      <v-btn depressed to="data" color="transparent" class="no-shadow">Data</v-btn>
+        <v-btn depressed to="trade" color="transparent" class="no-shadow">Trade</v-btn>
+       <v-btn depressed to="data" color="transparent" class="no-shadow">Data</v-btn>
+    
       <v-btn depressed to="rnn" color="transparent" class="no-shadow">RNN</v-btn>
       <v-btn depressed to="cnn" color="transparent" class="no-shadow">CNN</v-btn>
     </v-toolbar-items>

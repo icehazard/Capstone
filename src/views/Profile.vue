@@ -1,26 +1,97 @@
 <template>
-  <v-container>
-    <v-layout  pt-5 wrap>
-      <v-flex>
-        <AccountInfo></AccountInfo>
-      </v-flex>
-    </v-layout>
-    <v-layout pt-5 wrap>
-      <v-flex>
-       <APIinfo></APIinfo>
-      </v-flex>
-    </v-layout>
-  </v-container>
+  <section>
+    <v-toolbar color="grey darken-4">
+      <v-toolbar-title class="ml-5">User Profile</v-toolbar-title>
+    </v-toolbar>
+
+    <v-tabs color="amber darken-2" class="fill-height" background-color="grey darken-4" vertical>
+      <v-tab>
+        <v-icon left>mdi-account</v-icon>
+        Dashboard
+      </v-tab>
+      <v-tab>
+        <v-icon left>mdi-lock</v-icon>
+        Open Orders
+      </v-tab>
+      <v-tab>
+        <v-icon left>mdi-access-point</v-icon>
+        Trade History
+      </v-tab>
+
+      <v-tab-item>
+        <v-container fluid>
+          <v-row class="mx-0">
+            <v-col :cols="4">
+              <BalanceDetails></BalanceDetails>
+            </v-col>
+            <v-col :cols="4">
+              <OpenOrders></OpenOrders>
+            </v-col>
+            <v-col :cols="4">
+              <v-card color="grey darken-2" class="" height="400px">
+                <AccountInfo></AccountInfo>
+              </v-card>
+            </v-col>
+          </v-row>
+
+          <v-row class="mx-0">
+            <v-col :cols="8">
+              <v-card class="" color="grey darken-2" height="400px">
+                Graph of trade history of how much profit you are making everyday
+              </v-card>
+            </v-col>
+            <v-col :cols="4">
+              <v-card color="grey darken-2" class="" height="400px">
+                <APIinfo></APIinfo>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-tab-item>
+
+      <v-tab-item>
+        <v-container fluid>
+          <v-row class="mx-0">
+            <v-col>
+              <v-card flat>
+                <OpenOrdersFullTable></OpenOrdersFullTable>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-tab-item>
+
+      <v-tab-item>
+        <v-container fluid>
+          <v-row class="mx-0">
+            <v-col>
+              <v-card flat>
+                <TradeHistory></TradeHistory>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-tab-item>
+    </v-tabs>
+  </section>
 </template>
 
 <script>
 import AccountInfo from "../profile/AccountInfo";
 import APIinfo from "../profile/APIinfo";
+import BalanceDetails from "../profile/BalanceDetails";
+import OpenOrders from "../profile/OpenOrders";
+import OpenOrdersFullTable from "../profile/OpenOrdersFullTable";
+import TradeHistory from "../profile/TradeHistory";
 
 export default {
   components: {
     AccountInfo,
-    APIinfo
+    APIinfo,
+    BalanceDetails,
+    OpenOrders,
+    OpenOrdersFullTable,
+    TradeHistory
   },
   data: () => ({
     //
@@ -28,4 +99,8 @@ export default {
 };
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+section {
+  height: 100%;
+}
+</style>

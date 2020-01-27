@@ -10,11 +10,8 @@ const mongoose = require("mongoose");
 mongoose.connect(key.mongo, { useUnifiedTopology: true, useNewUrlParser: true }, () => console.log("Connected with Mongoose"));
 app.use(express.static("dist"));
 
-
 io.on("connection", async function(socket) {
-  //console.log(socket.handshake.query.token, "token"); 
   console.log(socket.id, "has connected!");
-
   binance.socketFunctions(socket);
   auth.socketFunctions(socket); 
 });

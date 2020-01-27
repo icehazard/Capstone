@@ -1,6 +1,8 @@
 <template>
-  <v-card shaped  max-width="500" min-height="250">
-    <v-card-text >
+  <v-card color="transparent" class=" fill-height">
+    <v-card-text>
+      <div class="headline	">Account Details</div>
+      <v-divider class="my-5"></v-divider>
       <div>Email Address</div>
       <p class="display-1 text--primary">
         {{ email }}
@@ -10,7 +12,7 @@
         {{ id }}
       </div>
       <div class="mt-5">
-        <p>Account created on: </p>
+        <p>Account created on:</p>
         <span class="text--primary mt-5"> {{ date }} </span>
       </div>
     </v-card-text>
@@ -36,7 +38,7 @@ export default {
   },
   sockets: {
     account(val) {
-      console.log(val);
+    //  console.log(val);
       this.email = val.email;
       this.id = val._id;
       this.date = new Date(val.date);

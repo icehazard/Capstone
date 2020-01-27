@@ -38,12 +38,20 @@ exports.socketFunctions = function ( socket) {
     });
 
     socket.on("openOrders", async function (data) {
-      const client = await authBinance();
-      let res = await client.openOrders({
-        symbol: data.symbol
-      });
+      const user = await auth();
 
-      socket.emit("openOrders", res);
+
+      let burl = "https://api.binance.com";
+      let endPoint = "/api/v3/openOrders";
+  
+      let dataQueryString = "recvWindow=20000&timestamp=" + Date.now();
+      let signature = CryptoJS.HmacSHA256(dataQueryString, user.apiSecret).toString(CryptoJS.enc.Hex);
+      let url = burl + endPoint + "?" + dataQueryString + "&signature=" + signature;
+      let res = await fetch(url, { method: "GET", headers: { "X-MBX-APIKEY": user.apiKey } });
+      res = await res.json();
+      console.log("TCL: exports.socketFunctions -> res", res)
+
+     socket.emit("openOrders", res);
     });
 
     socket.on("oco", async function (dump) {
@@ -62,6 +70,10 @@ exports.socketFunctions = function ( socket) {
       console.log("TCL: exports.socketFunctions -> res", res)
       socket.emit("oco", res);
     });
+
+    socket.on("openOrders", async function (dump) {
+      const client = await authBinance();
+    })
 
     socket.on("stoploss", async function (dump) {
       console.log("stoploss")
@@ -83,7 +95,6 @@ exports.socketFunctions = function ( socket) {
     });
 
     socket.on("getKlines", function (data) {
-      
       let time = data;
       fetch("https://api.binance.com/api/v1/klines?symbol=" + data.symbol + "&interval=" + data.timeframe)
         .then(resp => resp.json())

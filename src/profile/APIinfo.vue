@@ -1,27 +1,31 @@
 <template>
   <section>
-    <v-card v-if="apiKeyServer" shaped max-width="500" min-height="332">
+    <v-card v-if="apiKeyServer" color="transparent" class=" fill-height">
       <v-card-text>
-        <div>API Management</div>
+        <div class="headline	">API Management</div>
+        <v-divider class="my-5"></v-divider>
         <p class="mt-5">Public Key</p>
         <div class="text--primary">
-          {{ apiKeyServer}}
+          {{ apiKeyServer }}
         </div>
         <p class="mt-5">Public Key</p>
         <div class="text--primary">
-          {{ apiKeySecretServer}}
-          <v-card-actions>
-        <v-btn @click="change" class="ml-auto mt-auto" color="orange" text>
-          Change API Keys
-        </v-btn>
-      </v-card-actions>
+          {{ apiKeySecretServer }}
         </div>
 
+        <v-card-actions>
+          <v-btn @click="change" class="ml-auto mt-auto" color="orange" text>
+            Change API Keys
+          </v-btn>
+        </v-card-actions>
       </v-card-text>
     </v-card>
 
-    <v-card v-else  shaped max-width="500" min-height="332">
+    <v-card v-else color="transparent" class=" fill-height">
+      
       <v-card-text>
+        <div class="headline	">API Management</div>
+        <v-divider class="my-5"></v-divider>
         <p>Public Key</p>
         <v-text-field v-model="apiKeyUser" label="Public Key" outlined></v-text-field>
         <p>Private Key</p>
@@ -51,11 +55,11 @@ export default {
     send() {
       this.$socket.client.emit("apiMan", { apiKey: this.apiKeyUser, apiKeySecret: this.apiKeySecretUser });
     },
-    change(){
-     this.apiKeyUser = this.apiKeyServer
-     this.apiKeySecretUser = this.apiKeySecretServer
-     this.apiKeyServer = ""
-     this.apiKeySecretServer = ""
+    change() {
+      this.apiKeyUser = this.apiKeyServer;
+      this.apiKeySecretUser = this.apiKeySecretServer;
+      this.apiKeyServer = "";
+      this.apiKeySecretServer = "";
       //this.$socket.client.emit("apiMan", { apiKey: this.apiKeyUser, apiKeySecret: this.apiKeySecretUser });
     }
   },
@@ -64,12 +68,14 @@ export default {
   },
   sockets: {
     apiMan(val) {
-      console.log("TCL: apiMan -> val", val)
-      this.apiKeyServer = val.apiKey
-      this.apiKeySecretServer= val.apiKeySecret
+     // console.log("TCL: apiMan -> val", val);
+      this.apiKeyServer = val.apiKey;
+      this.apiKeySecretServer = val.apiKeySecret;
     }
   }
 };
 </script>
 
-<style></style>
+<style lang="scss">
+
+</style>
