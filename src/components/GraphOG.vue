@@ -10,15 +10,20 @@ export default {
   data() {
     return {
       data: [],
-      interval: null
+      interval: null,
+      emitInterval: null,
+      change: false
     };
   },
   sockets: {
     getKlines(val) {
       this.data = val.data;
-      if (val.timeframe != this.timeFrame) {
-        console.log("TCL: getKlines -> this.timeFrame", val.timeframe);
-        this.mana();
+      if ((val.timeframe == this.timeFrame || val.symbol == this.symbol) && this.change) {
+        d3.select(".graph")
+        .selectAll("*")
+        .remove();
+        this.graph();
+        this.change = false;
       }
     }
   },
@@ -40,12 +45,9 @@ export default {
   },
   methods: {
     mana() {
+      this.change = true;
       clearInterval(this.interval);
       this.$socket.client.emit("getKlines", { timeframe: this.timeFrame, symbol: this.symbol });
-      d3.select(".graph")
-        .selectAll("*")
-        .remove();
-      this.graph();
     },
     graph() {
       let parentThis = this;
@@ -408,11 +410,10 @@ export default {
       svg.append("g").attr("class", "crosshair rsiStoch");
 
       document.getElementsByClassName("rsi")[0].style.transform = " translate(0px, 80px)";
-       document.getElementsByClassName("crosshair rsi")[0].style.transform = " translate(0px, 80px)";
+      document.getElementsByClassName("crosshair rsi")[0].style.transform = " translate(0px, 80px)";
       document.getElementsByClassName("rsiStoch")[0].style.transform = " translate(0px, 170px)";
       document.getElementsByClassName("crosshair rsiStoch")[0].style.transform = " translate(0px, 195px)";
-     
-      
+
       svg.call(zoom);
 
       svg
@@ -426,7 +427,6 @@ export default {
 
       this.interval = setInterval(() => {
         if (this.data[0]) {
-          this.$socket.client.emit("getKlines", { timeframe: parentThis.timeFrame, symbol: parentThis.symbol });
           var accessor = candlestick.accessor();
 
           let data = this.data
@@ -538,7 +538,7 @@ export default {
 
           svg.call(zoom.transform, t);
         }
-      }, 500);
+      }, 1000);
 
       function zoomed() {
         x.zoomable().domain(d3.event.transform.rescaleX(zoomableInit).domain());
@@ -585,10 +585,16 @@ export default {
   },
   beforeDestroy() {
     clearInterval(this.interval);
+    clearInterval(this.emitInterval);
     document.title = "Boca";
   },
   mounted() {
     this.$socket.client.emit("getKlines", { timeframe: this.timeFrame, symbol: this.symbol });
+    this.emitInterval = setInterval(() => {
+      this.$socket.client.emit("getKlines", { timeframe: this.timeFrame, symbol: this.symbol });
+      console.log("TCL: this.emitInterval -> { timeframe: this.timeFrame, symbol: this.symbol }", this.timeFrame);
+    }, 1000);
+
     this.graph();
   }
 };

@@ -14,7 +14,6 @@ exports.socketFunctions = function ( socket) {
     if (!socket.handshake.query.token) return Binance({ apiKey: key.apiKeyGuest, apiSecret: key.apiSecretGuest });
     const decoded = jwt.verify(socket.handshake.query.token, key.TOKEN_SECRET);
     let user =  await User.findOne({ _id: decoded._id });
-
     if (!user.apiKey) return Binance({ apiKey: key.apiKeyGuest, apiSecret: key.apiSecretGuest });
     return Binance({ apiKey: user.apiKey, apiSecret: user.apiKeySecret });
   }
@@ -23,13 +22,39 @@ exports.socketFunctions = function ( socket) {
     if (!socket.handshake.query.token) return{ apiKey: key.apiKeyGuest, apiSecret: key.apiSecretGuest }
     const decoded = jwt.verify(socket.handshake.query.token, key.TOKEN_SECRET);
     let user =  await User.findOne({ _id: decoded._id });
-    console.log("TCL: auth -> user", user.apiKeySecret)
-
     if(!user.apiKey) return { apiKey: key.apiKeyGuest, apiSecret: key.apiSecretGuest }
-
-    
     return { apiKey: user.apiKey, apiSecret: user.apiKeySecret }
   }
+
+  socket.on("homeOrder", async function (dump) {
+    let res = await fetch("https://api.coincap.io/v2/assets")
+    res = await res.json();
+    socket.emit("homeOrder", res);
+  });
+
+  socket.on("CancelAllOrder", async function (dump) {
+    let arrayOrders = [];
+    const user = await auth();
+    const client = await authBinance();
+    let burl = "https://api.binance.com";
+    let endPoint = "/api/v3/openOrders";
+    let dataQueryString = "recvWindow=20000&timestamp=" + Date.now();
+    let signature = CryptoJS.HmacSHA256(dataQueryString, user.apiSecret).toString(CryptoJS.enc.Hex);
+    let url = burl + endPoint + "?" + dataQueryString + "&signature=" + signature;
+    let res = await fetch(url, { method: "GET", headers: { "X-MBX-APIKEY": user.apiKey } });
+    res = await res.json();
+    console.log("TCL: exports.socketFunctions -> res", res)
+
+    for (x in res){
+     // arrayOrders.push(res[x].orderId)
+      console.log(await client.cancelOrder({
+        symbol: res[x].symbol,
+        orderId: res[x].orderId,
+      }))
+    }
+    console.log("TCL: exports.socketFunctions -> res", arrayOrders)
+    socket.emit("CancelAllOrder", arrayOrders);
+  });
 
     socket.on("pairs", async function (dump) {
       const client = await authBinance();
@@ -39,18 +64,13 @@ exports.socketFunctions = function ( socket) {
 
     socket.on("openOrders", async function (data) {
       const user = await auth();
-
-
       let burl = "https://api.binance.com";
       let endPoint = "/api/v3/openOrders";
-  
       let dataQueryString = "recvWindow=20000&timestamp=" + Date.now();
       let signature = CryptoJS.HmacSHA256(dataQueryString, user.apiSecret).toString(CryptoJS.enc.Hex);
       let url = burl + endPoint + "?" + dataQueryString + "&signature=" + signature;
       let res = await fetch(url, { method: "GET", headers: { "X-MBX-APIKEY": user.apiKey } });
       res = await res.json();
-      console.log("TCL: exports.socketFunctions -> res", res)
-
      socket.emit("openOrders", res);
     });
 
@@ -61,7 +81,7 @@ exports.socketFunctions = function ( socket) {
       let price = dump.target;
       let burl = "https://api.binance.com";
       let endPoint = "/api/v3/order/oco";
-      let param = "&symbol=" + dump.symbol + "&side=SELL&quantity=" + quantity + "&price=" + price + "&stopPrice=" + (parseFloat(dump.stoploss) + 0.0001).toFixed(4) + "&stopLimitPrice=" + dump.stoploss + "&stopLimitTimeInForce=GTC&";
+      let param = "&symbol=" + dump.symbol + "&side=SELL&quantity=" + quantity + "&price=" + price + "&stopPrice=" + (parseFloat(dump.stoploss) + 0.0002).toFixed(4) + "&stopLimitPrice=" + dump.stoploss + "&stopLimitTimeInForce=GTC&";
       let dataQueryString = "recvWindow=20000&timestamp=" + Date.now() + param;
       let signature = CryptoJS.HmacSHA256(dataQueryString, user.apiSecret).toString(CryptoJS.enc.Hex);
       let url = burl + endPoint + "?" + dataQueryString + "&signature=" + signature;

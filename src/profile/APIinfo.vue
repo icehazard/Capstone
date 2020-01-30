@@ -2,7 +2,11 @@
   <section>
     <v-card v-if="apiKeyServer" color="transparent" class=" fill-height">
       <v-card-text>
-        <div class="headline	">API Management</div>
+        <div class="d-flex">
+          <div class="headline">Open Orders</div>
+          <v-spacer></v-spacer>
+          <a @click="change" class="text-link d-flex align-end">Change API Keys</a>
+        </div>
         <v-divider class="my-5"></v-divider>
         <p class="mt-5">Public Key</p>
         <div class="text--primary">
@@ -12,30 +16,22 @@
         <div class="text--primary">
           {{ apiKeySecretServer }}
         </div>
-
-        <v-card-actions>
-          <v-btn @click="change" class="ml-auto mt-auto" color="orange" text>
-            Change API Keys
-          </v-btn>
-        </v-card-actions>
       </v-card-text>
     </v-card>
 
     <v-card v-else color="transparent" class=" fill-height">
-      
       <v-card-text>
-        <div class="headline	">API Management</div>
+        <div class="d-flex">
+          <div class="headline">Open Orders</div>
+          <v-spacer></v-spacer>
+          <a @click="send" class="text-link d-flex align-end">Change API Keys</a>
+        </div>
         <v-divider class="my-5"></v-divider>
         <p>Public Key</p>
         <v-text-field v-model="apiKeyUser" label="Public Key" outlined></v-text-field>
         <p>Private Key</p>
         <v-text-field v-model="apiKeySecretUser" label="Private Key" outlined></v-text-field>
       </v-card-text>
-      <v-card-actions>
-        <v-btn @click="send" class="ml-auto " color="orange" text>
-          Add Api Keys
-        </v-btn>
-      </v-card-actions>
     </v-card>
   </section>
 </template>
@@ -68,7 +64,7 @@ export default {
   },
   sockets: {
     apiMan(val) {
-     // console.log("TCL: apiMan -> val", val);
+      // console.log("TCL: apiMan -> val", val);
       this.apiKeyServer = val.apiKey;
       this.apiKeySecretServer = val.apiKeySecret;
     }
@@ -76,6 +72,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-
-</style>
+<style lang="scss"></style>

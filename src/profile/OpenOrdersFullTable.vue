@@ -19,6 +19,25 @@
             </v-card>
           </v-dialog>
         </template>
+        <template v-slot:item.time="{ item }">
+          <div>{{ item.time | date }}</div>
+        </template>
+        <template v-slot:item.origQty="{ item }">
+          <div>{{ item.origQty | amount }}</div>
+        </template>
+        <template v-slot:item.executedQty="{ item }">
+          <div>{{ item.executedQty | price }}</div>
+        </template>
+        <template v-slot:item.stopPrice="{ item }">
+          <div>{{ item.stopPrice | price }}</div>
+        </template>
+
+        <template v-slot:item.type="{ item }">
+          <div>{{ item.type | ordertype }}</div>
+        </template>
+        <template v-slot:item.price="{ item }">
+          <div>{{ item.price | price }}</div>
+        </template>
         <template v-slot:item.action="{ item }">
           <v-icon small class="mr-2" @click="editItem(item)">
             Cancel
@@ -52,6 +71,31 @@ export default {
   watch: {
     dialog(val) {
       val || this.close();
+    }
+  },
+  filters: {
+    date(val){
+      return new Date(val).toLocaleString()
+
+    },
+    price(val) {
+      val = Number(val);
+      if (val > 1000) return "$" + val.toFixed(0);
+      if (val > 1) return "$" + val.toFixed(2);
+      if (val > 0.01) return "$" + val.toFixed(4);
+      return "$" + val.toFixed(6);
+    },
+    amount(val) {
+      val = Number(val);
+      if (val > 1000) return val.toFixed(0);
+      if (val > 1) return val.toFixed(2);
+      if (val > 0.01) return val.toFixed(4);
+      return val.toFixed(6);
+    },
+    ordertype(val) {
+      if (val == "STOP_LOSS_LIMIT") return "Stop Loss";
+      if (val == "LIMIT_MAKER") return "Limit Maker";
+      return val;
     }
   },
   methods: {

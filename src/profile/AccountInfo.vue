@@ -1,7 +1,11 @@
 <template>
   <v-card color="transparent" class=" fill-height">
     <v-card-text>
-      <div class="headline	">Account Details</div>
+      <div class="d-flex">
+          <div class="headline">Account Details</div>
+          <v-spacer></v-spacer>
+          <a class="text-link d-flex align-end">Change</a>
+        </div>
       <v-divider class="my-5"></v-divider>
       <div>Email Address</div>
       <p class="display-1 text--primary">

@@ -47,6 +47,7 @@ export default {
         return this.symbol.startsWith(item.asset);
       });
       let usdt = b[0].free;
+      
 
       b[0] ? this.$store.commit("updateUsdt", parseFloat(b[0].free)) : 0
       c[0] ? this.$store.commit("updateAssetPrice", parseFloat(c[0].free)) : 0
