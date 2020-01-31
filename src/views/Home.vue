@@ -26,7 +26,7 @@ import Graph from "../components/Graph";
 import GraphOG from "../components/GraphOG";
 import Panel from "../components/Panel";
 import Toolbar from "../atoms/timeFrameToolbar";
-import Pairs from "../atoms/Panel_trading_pairs";
+import Pairs from "../atoms/Panel_trading_panel_main";
 
 export default {
   components: {

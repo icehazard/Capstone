@@ -28,12 +28,14 @@
         @click="showpanel"
         dense
         filled
+        height="20"
+        clearable
         v-on:keyup.enter="changeSymbol"
         v-on:keyup="showpanel"
         v-model="symbolText"
         :placeholder="this.symbol"
         autocomplete="off"
-        class="mt-2 ml-3 toggle_trading_panel"
+        class="mt-7 ml-3 toggle_trading_panel"
       ></v-text-field>
     </div>
     <v-btn @click="changeSymbol" text class="ml-1 pt-0 toggle_trading_panel"><v-icon>mdi-magnify</v-icon></v-btn>

@@ -12,16 +12,15 @@ export default {
       data: [],
       interval: null,
       emitInterval: null,
-      change: false
+      change: false,
+      intervalFrequency: 500
     };
   },
   sockets: {
     getKlines(val) {
       this.data = val.data;
       if ((val.timeframe == this.timeFrame || val.symbol == this.symbol) && this.change) {
-        d3.select(".graph")
-        .selectAll("*")
-        .remove();
+       
         this.graph();
         this.change = false;
       }
@@ -45,9 +44,14 @@ export default {
   },
   methods: {
     mana() {
-      this.change = true;
-      clearInterval(this.interval);
+      
       this.$socket.client.emit("getKlines", { timeframe: this.timeFrame, symbol: this.symbol });
+      clearInterval(this.interval);
+       d3.select(".graph")
+        .selectAll("*")
+        .remove();
+      this.change = true;
+      
     },
     graph() {
       let parentThis = this;
@@ -538,7 +542,7 @@ export default {
 
           svg.call(zoom.transform, t);
         }
-      }, 1000);
+      }, parentThis.intervalFrequency);
 
       function zoomed() {
         x.zoomable().domain(d3.event.transform.rescaleX(zoomableInit).domain());
@@ -592,8 +596,7 @@ export default {
     this.$socket.client.emit("getKlines", { timeframe: this.timeFrame, symbol: this.symbol });
     this.emitInterval = setInterval(() => {
       this.$socket.client.emit("getKlines", { timeframe: this.timeFrame, symbol: this.symbol });
-      console.log("TCL: this.emitInterval -> { timeframe: this.timeFrame, symbol: this.symbol }", this.timeFrame);
-    }, 1000);
+    }, this.intervalFrequency);
 
     this.graph();
   }

@@ -4,7 +4,7 @@
      <div class="d-flex">
         <div class="headline">Open Orders</div>
         <v-spacer></v-spacer>
-        <a @click="cancel" class="text-link d-flex align-end">Cancel All</a>
+        <a @click="cancel" class="text-link d-flex align-end">Cancel</a>
      </div>
       <v-divider class="my-5"></v-divider>
       <v-data-table hide-default-footer :headers="headers" :items="data" class="elevation-1  ma-n4">

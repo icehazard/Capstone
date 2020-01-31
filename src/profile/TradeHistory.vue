@@ -15,6 +15,7 @@ export default {
       data: [],
       headers: [
         { text: "Long", value: "isBuyer" },
+        { text: "symbol", value: "symbol" },
         { text: "Price", value: "price" },
         { text: "qty", value: "qty" },
         { text: "quoteQty", value: "quoteQty" },

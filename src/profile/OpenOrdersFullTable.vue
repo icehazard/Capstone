@@ -75,7 +75,7 @@ export default {
   },
   filters: {
     date(val){
-      return new Date(val).toLocaleString()
+      return new Date(val).toLocaleString('en-GB')
 
     },
     price(val) {

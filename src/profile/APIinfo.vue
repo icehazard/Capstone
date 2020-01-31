@@ -3,9 +3,9 @@
     <v-card v-if="apiKeyServer" color="transparent" class=" fill-height">
       <v-card-text>
         <div class="d-flex">
-          <div class="headline">Open Orders</div>
+          <div class="headline">API Management</div>
           <v-spacer></v-spacer>
-          <a @click="change" class="text-link d-flex align-end">Change API Keys</a>
+          <a @click="change" class="text-link d-flex align-end">Change</a>
         </div>
         <v-divider class="my-5"></v-divider>
         <p class="mt-5">Public Key</p>
@@ -22,9 +22,9 @@
     <v-card v-else color="transparent" class=" fill-height">
       <v-card-text>
         <div class="d-flex">
-          <div class="headline">Open Orders</div>
+          <div class="headline">API Management</div>
           <v-spacer></v-spacer>
-          <a @click="send" class="text-link d-flex align-end">Change API Keys</a>
+          <a @click="send" class="text-link d-flex align-end">Change</a>
         </div>
         <v-divider class="my-5"></v-divider>
         <p>Public Key</p>
