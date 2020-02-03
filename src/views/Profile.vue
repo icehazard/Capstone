@@ -4,17 +4,17 @@
       <v-toolbar-title class="ml-5">User Profile</v-toolbar-title>
     </v-toolbar>
 
-    <v-tabs color="amber darken-2" class="fill-height" background-color="grey darken-4" vertical>
+    <v-tabs color="amber darken-2 " class="fill-height" background-color="grey darken-4" vertical>
       <v-tab>
         <v-icon left>mdi-account</v-icon>
         Dashboard
       </v-tab>
       <v-tab>
-        <v-icon left>mdi-lock</v-icon>
+        <v-icon left>mdi-book-open</v-icon>
         Open Orders
       </v-tab>
       <v-tab>
-        <v-icon left>mdi-access-point</v-icon>
+        <v-icon left>mdi-history</v-icon>
         Trade History
       </v-tab>
 
@@ -99,8 +99,9 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="less" >
 section {
   height: 100%;
 }
+
 </style>

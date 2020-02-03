@@ -13,20 +13,29 @@ export default {
       interval: null,
       emitInterval: null,
       change: false,
-      intervalFrequency: 500
+      intervalFrequency: 500,
+      tradeHistory: []
     };
   },
   sockets: {
     getKlines(val) {
       this.data = val.data;
       if ((val.timeframe == this.timeFrame || val.symbol == this.symbol) && this.change) {
-       
         this.graph();
         this.change = false;
       }
+    },
+    lastOrder(val) {
+      val = val.slice(0, val.length).reverse();
+      if (!val[0]) return (this.tradeHistory = []);
+      var jsonString = JSON.stringify(val, this.replacer);
+      this.tradeHistory = JSON.parse(jsonString);
     }
   },
   computed: {
+    tradingArrows() {
+      return this.$store.state.tradingArrows;
+    },
     timeFrame() {
       return this.$store.state.timeFrame;
     },
@@ -43,15 +52,28 @@ export default {
     }
   },
   methods: {
+    replacer(key, value) {
+      if (key === "isBuyer") {
+        return value ? "Buy" : "Sell";
+      }
+      if (key === "qty" || key === "quoteQty") {
+        return Number(value).toFixed(4);
+      }
+      if (typeof value === "boolean") {
+        return String(value);
+      }
+      if (typeof value === "string" && key == "price") {
+        return Number(value).toFixed(4);
+      }
+      return value;
+    },
     mana() {
-      
       this.$socket.client.emit("getKlines", { timeframe: this.timeFrame, symbol: this.symbol });
       clearInterval(this.interval);
-       d3.select(".graph")
+      d3.select(".graph")
         .selectAll("*")
         .remove();
       this.change = true;
-      
     },
     graph() {
       let parentThis = this;
@@ -114,6 +136,17 @@ export default {
         .candlestick()
         .xScale(x)
         .yScale(y);
+
+      var tradearrow = techan.plot
+        .tradearrow()
+        .xScale(x)
+        .yScale(y)
+        .y(function(d) {
+          // Display the buy and sell arrows a bit above and below the price, so the price is still visible
+          if (d.type === "buy") return y(d.price);
+          if (d.type === "sell") return y(d.price);
+          else return y(d.price);
+        });
 
       var sma0 = techan.plot
         .sma()
@@ -408,6 +441,14 @@ export default {
           return "url(#indicatorClip-" + i + ")";
         });
 
+      // Add trendlines and other interactions last to be above zoom pane
+      svg.append("g").attr("class", "crosshair ohlc");
+
+      svg
+        .append("g")
+        .attr("class", "tradearrow")
+        .attr("clip-path", "url(#ohlcClip)");
+
       svg.append("g").attr("class", "crosshair ohlc");
       svg.append("g").attr("class", "crosshair macd");
       svg.append("g").attr("class", "crosshair rsi");
@@ -462,6 +503,23 @@ export default {
           rsiScale.domain(techan.scale.plot.rsi(rsiData).domain());
           rsiStochScale.domain(techan.scale.plot.rsi(rsiStochData).domain());
 
+          if (parentThis.tradeHistory != [] && parentThis.tradingArrows == true) {
+            var trades = [];
+            for (let el of parentThis.tradeHistory) {
+              let timestamp = new Date(el.time);
+              timestamp.setHours(timestamp.getHours() + 5);
+              if (new Date(timestamp) > new Date(data[0].date)) trades.push({ date: timestamp, type: el.isBuyer.toLowerCase(), price: Number(el.price), quantity: Number(el.qty) });
+            }
+
+            svg
+              .select("g.tradearrow")
+              .datum(trades)
+              .call(tradearrow);
+          }
+          if (parentThis.tradingArrows == false) {
+            d3.select("g.tradearrow > g.data").remove();
+          }
+
           let collection = [];
           const period = 50;
           let highest, lowest, stochRSI;
@@ -515,12 +573,11 @@ export default {
             .select("g.rsiStoch .indicator-plot")
             .datum(rsiStochData)
             .call(rsiStoch);
+
           svg.select("g.crosshair.ohlc").call(ohlcCrosshair);
           svg.select("g.crosshair.macd").call(macdCrosshair);
           svg.select("g.crosshair.rsi").call(rsiCrosshair);
           svg.select("g.crosshair.rsiStoch").call(rsiStochCrosshair);
-
-          // draw();
 
           if (!t) {
             zoomableInit = x
@@ -580,6 +637,10 @@ export default {
         svg.select("g.crosshair.ohlc").call(ohlcCrosshair);
         svg.select("g.crosshair.macd").call(macdCrosshair);
         svg.select("g.crosshair.rsiStoch").call(rsiStochCrosshair);
+        if (parentThis.tradingArrows == true) {
+          svg.select("g.tradearrow").call(tradearrow.refresh);
+        }
+
         document.getElementsByClassName("rsiStoch")[0].lastElementChild.firstElementChild.style.transform = " translate(0px, 25px)";
         document.querySelector("g.rsiStoch.indicator g.axis.left").style.transform = " translate(0px, 25px)";
         let widthX = dim.width - 110;
@@ -608,7 +669,7 @@ text {
   fill: #bbbbbb;
 }
 
-path {
+.indicator-plot path {
   fill: none;
   stroke-width: 1;
 }
@@ -761,15 +822,15 @@ path.zero {
 }
 
 .tradearrow path.tradearrow {
-  stroke: none;
+  stroke: white;
 }
 
 .tradearrow path.buy {
-  fill: #0000ff;
+  fill: #4caf50;
 }
 
 .tradearrow path.sell {
-  fill: #9900ff;
+  fill: #bf360c;
 }
 
 .tradearrow path.highlight {

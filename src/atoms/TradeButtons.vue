@@ -2,7 +2,7 @@
   <v-layout mt-3 class="btn_panel">
     <v-btn :disabled="idlePosition" outlined width="80px" @click="buy" color="green" class="ma-1">Buy</v-btn>
     <v-btn :disabled="!idlePosition" outlined width="80px" @click="sell" color="red" class="ma-1">Sell</v-btn>
-    <v-btn :disabled="!idlePosition" outlined width="80px" @click="modify" color="white" class="ma-1">Modify</v-btn>
+    <v-btn :disabled="!idlePosition" outlined width="80px" @click="modify" color="primary" class="ma-1">Modify</v-btn>
     <v-switch class="mt-2 ml-auto mr-2" v-model="switch1" dense disabled color="primary" hide-details label="Market Buy"></v-switch>
   </v-layout>
 </template>

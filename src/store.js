@@ -30,9 +30,13 @@ export default new Vuex.Store({
     showTradingPairPanel: false,
     searchTradingPairPanel: '',
     token: '',
-    email: ''
+    email: '',
+    tradingArrows: false
   },
   mutations: {
+    updatedTradingArrows(state, n) {
+      state.tradingArrows = n;
+    },
     updatesEmail(state, n) {
       state.email = n;
     },

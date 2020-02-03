@@ -13,16 +13,12 @@
       <v-flex xs6 md3 lg3>
         <div class="top-section "><Panel></Panel></div>
       </v-flex>
-      <!-- <v-flex xs6 md12>
-            <div class="top-section  bottom-section ">Controls</div>
-        </v-flex> -->
     </v-layout>
   </v-container>
 </template>
 
 <script>
 import HelloWorld from "../components/HelloWorld";
-import Graph from "../components/Graph";
 import GraphOG from "../components/GraphOG";
 import Panel from "../components/Panel";
 import Toolbar from "../atoms/timeFrameToolbar";
@@ -31,7 +27,6 @@ import Pairs from "../atoms/Panel_trading_panel_main";
 export default {
   components: {
     HelloWorld,
-    Graph,
     GraphOG,
     Panel,
     Toolbar,

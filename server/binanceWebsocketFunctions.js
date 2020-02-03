@@ -141,7 +141,7 @@ exports.socketFunctions = function(socket) {
 
   socket.on("lastOrder", async function(data) {
     const client = await authBinance();
-    let account = await client.myTrades({ symbol: data.symbol, limit: "10" });
+    let account = await client.myTrades({ symbol: data.symbol, limit: "200" });
     socket.emit("lastOrder", account);
   });
 

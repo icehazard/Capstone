@@ -24,26 +24,21 @@
       </v-btn>
     </v-btn-toggle>
     <div>
-      <v-text-field
-        @click="showpanel"
-        dense
-        filled
-        height="20"
-        clearable
-        v-on:keyup.enter="changeSymbol"
-        v-on:keyup="showpanel"
-        v-model="symbolText"
-        :placeholder="this.symbol"
-        autocomplete="off"
-        class="mt-7 ml-3 toggle_trading_panel"
-      ></v-text-field>
+      <v-text-field @click="showpanel" dense filled height="20" clearable v-on:keyup.enter="changeSymbol" v-on:keyup="showpanel" v-model="symbolText" :placeholder="this.symbol" autocomplete="off" class="mt-5 ml-3 toggle_trading_panel"></v-text-field>
     </div>
     <v-btn @click="changeSymbol" text class="ml-1 pt-0 toggle_trading_panel"><v-icon>mdi-magnify</v-icon></v-btn>
+  
+    <GraphToolbar></GraphToolbar>
   </v-toolbar>
 </template>
 
 <script>
+import GraphToolbar from "./GraphToolbar";
+
 export default {
+  components: {
+    GraphToolbar
+  },
   data() {
     return {
       toggle_exclusive: null,
@@ -55,7 +50,7 @@ export default {
       this.$store.commit("updatesSowTradingPairPanel", true);
     },
     hidepanel() {
-     this.$store.commit("updatesSowTradingPairPanel", false);
+      this.$store.commit("updatesSowTradingPairPanel", false);
     },
     changeSymbol() {
       this.$store.commit("updatesymbol", this.symbolText);
@@ -67,19 +62,18 @@ export default {
     },
     symbol() {
       return this.$store.state.symbol;
-    },
+    }
   },
   watch: {
     toggle_exclusive: function(newVal) {
       this.$store.commit("updateTimeframe", newVal);
     },
-    symbolText(val){
-    this.$store.commit("updatesSearchTradingPairPanel", val);
+    symbolText(val) {
+      this.$store.commit("updatesSearchTradingPairPanel", val);
     },
-    symbol(val){
+    symbol(val) {
       this.symbolText = val;
     }
-
   },
   beforeMount() {
     this.toggle_exclusive = this.timeFrame;
@@ -88,10 +82,12 @@ export default {
   mounted() {
     let that = this;
     //this even listner needs to be destroyed
-    document.addEventListener("click",function(event) {
+    document.addEventListener(
+      "click",
+      function(event) {
         if (!event.target.closest(".toggle_trading_panel")) {
           that.hidepanel();
-        } 
+        }
       },
       false
     );
