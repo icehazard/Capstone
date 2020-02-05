@@ -1,6 +1,7 @@
 <template>
   <v-app-bar dense app>
     <v-toolbar-items class="hidden-xs-only">
+      <!-- <img class="logo mx-3" src="https://res.cloudinary.com/dorhsrqla/image/upload/v1580768276/logo_orange_eh8wpg.png"> -->
       <v-btn depressed to="/" color="transparent" class="no-shadow">
         <span >Boca</span><span class="font-weight-light">Chica</span>
       </v-btn>
@@ -50,5 +51,11 @@ export default {
 .v-toolbar__content,
 .v-toolbar__extension {
   padding: 0px !important;
+}
+
+.logo{
+  width: 50px;
+  height: auto;
+
 }
 </style>

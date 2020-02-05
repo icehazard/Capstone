@@ -112,16 +112,16 @@ exports.socketFunctions = function(socket) {
   });
 
   socket.on("stoploss", async function(dump) {
-    console.log("stoploss");
+    console.log(dump);
     const client = await authBinance();
     console.log(
       await client
-        .order({
+        .order({ 
           symbol: dump.symbol,
           side: "SELL",
           type: "STOP_LOSS_LIMIT",
-          quantity: (parseFloat(dump.asset) * 0.99).toFixed(2),
-          price: Number(dump.stoploss).toFixed(4) - 0.0002,
+          quantity: (parseFloat( Number(dump.asset)) * 0.99).toFixed(2),
+          price: Number(dump.stoploss - 0.0002 ).toFixed(4) ,
           stopPrice: dump.stoploss
         })
         .catch(error => {

@@ -37,7 +37,7 @@
           <v-row class="mx-0">
             <v-col :cols="8">
               <v-card class="" color="grey darken-2" height="400px">
-                Graph of trade history of how much profit you are making everyday
+                <TradeHistoryGraph></TradeHistoryGraph>
               </v-card>
             </v-col>
             <v-col :cols="4">
@@ -83,6 +83,7 @@ import BalanceDetails from "../profile/BalanceDetails";
 import OpenOrders from "../profile/OpenOrders";
 import OpenOrdersFullTable from "../profile/OpenOrdersFullTable";
 import TradeHistory from "../profile/TradeHistory";
+import TradeHistoryGraph from "../profile/TradeHistoryGraph";
 
 export default {
   components: {
@@ -91,7 +92,8 @@ export default {
     BalanceDetails,
     OpenOrders,
     OpenOrdersFullTable,
-    TradeHistory
+    TradeHistory,
+    TradeHistoryGraph
   },
   data: () => ({
     //

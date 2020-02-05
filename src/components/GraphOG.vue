@@ -675,7 +675,7 @@ text {
 }
 
 path.candle {
-  stroke: #000000;
+  stroke: #ffffff;
 }
 
 path.candle.body {
@@ -718,7 +718,7 @@ path.volume {
 }
 
 path.macd {
-  stroke: #0000aa;
+  stroke: #ffffff;
 }
 
 path.signal {
