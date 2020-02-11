@@ -1,15 +1,11 @@
 <template>
   <v-app-bar dense app>
     <v-toolbar-items class="hidden-xs-only">
-      <!-- <img class="logo mx-3" src="https://res.cloudinary.com/dorhsrqla/image/upload/v1580768276/logo_orange_eh8wpg.png"> -->
       <v-btn depressed to="/" color="transparent" class="no-shadow">
         <span >Boca</span><span class="font-weight-light">Chica</span>
       </v-btn>
         <v-btn depressed to="trade" color="transparent" class="no-shadow">Trade</v-btn>
-       <v-btn depressed to="data" color="transparent" class="no-shadow">Data</v-btn>
-    
-      <v-btn depressed to="rnn" color="transparent" class="no-shadow">RNN</v-btn>
-      <v-btn depressed to="cnn" color="transparent" class="no-shadow">CNN</v-btn>
+       <v-btn depressed to="data" color="transparent" class="no-shadow">Algo Trading</v-btn>
     </v-toolbar-items>
     <v-spacer></v-spacer>
     <v-toolbar-items v-if="email == ''">

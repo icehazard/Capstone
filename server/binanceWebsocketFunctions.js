@@ -5,6 +5,7 @@ let CryptoJS = require("crypto-js");
 const fetch = require("node-fetch");
 const User = require("./User.js");
 const jwt = require("jsonwebtoken");
+var fs = require("fs");
 
 exports.socketFunctions = function(socket) {
   async function authBinance() {
@@ -23,20 +24,61 @@ exports.socketFunctions = function(socket) {
     return { apiKey: user.apiKey, apiSecret: user.apiKeySecret };
   }
 
+  socket.on("historicalDataBot", async function(data) {
+    const filename = "datasets/" + data.symbol + "-" + data.start + "-" + data.finish + "-" + data.timeframe + ".txt";
+
+    if (fs.existsSync(filename)) {
+      fs.readFile(filename, "utf8", (err, dataa) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        console.log(new Date(data.finish).valueOf())
+      })
+    } else {
+      const oneDay = 24 * 60 * 60 * 1000;
+      let endDate = new Date()
+      var dt = new Date(endDate);
+      let startDate =  dt.setDate( dt.getDate() - 3 );
+      const diffDays = Math.round(Math.abs((startDate - endDate) / oneDay));
+      console.log("TCL: exports.socketFunctions -> startDate", diffDays)
+
+      let res = await fetch("https://api.coincap.io/v2/candles?exchange=binance&interval=m1&baseId=bitcoin&quoteId=tether&start=1581347191000&end=1581433591000");
+      res = await res.json();
+      //console.log("TCL: exports.socketFunctions -> res", res.data[0])
+
+      for (let x = 0; x < diffDays; x++){
+        console.log(x)
+      }
+
+
+      // fs.appendFile(filename, JSON.stringify(res.data[0]), function(err) {
+      //   if (err) throw err;
+      //   console.log("Saved!");
+      // });
+    }
+
+    // console.log("TCL: exports.socketFunctions -> data", data);
+
+    socket.emit("historicalDataBot", data);
+  });
+
   socket.on("getRate", async function(data) {
-    let array1 = Array.apply(null, Array(data.length)).map(function (x, i) { return i; })
-    async function getRate(el){
+    let array1 = Array.apply(null, Array(data.length)).map(function(x, i) {
+      return i;
+    });
+    async function getRate(el) {
       let res = await fetch("https://api.coincap.io/v2/assets?search=" + data[el].asset);
-        res = await res.json();
-        data[el].usd = res.data[0].priceUsd * data[el].total;
-        return  data[el].usd
+      res = await res.json();
+      data[el].usd = res.data[0].priceUsd * data[el].total;
+      return data[el].usd;
     }
 
     const promises = array1.map(async idx => {
-      return await getRate(idx)
-    })
+      return await getRate(idx);
+    });
 
-    await Promise.all(promises)
+    await Promise.all(promises);
     socket.emit("getRate", data);
   });
 
@@ -116,12 +158,12 @@ exports.socketFunctions = function(socket) {
     const client = await authBinance();
     console.log(
       await client
-        .order({ 
+        .order({
           symbol: dump.symbol,
           side: "SELL",
           type: "STOP_LOSS_LIMIT",
-          quantity: (parseFloat( Number(dump.asset)) * 0.99).toFixed(2),
-          price: Number(dump.stoploss - 0.0002 ).toFixed(4) ,
+          quantity: (parseFloat(Number(dump.asset)) * 0.99).toFixed(2),
+          price: Number(dump.stoploss - 0.0002).toFixed(4),
           stopPrice: dump.stoploss
         })
         .catch(error => {
@@ -130,20 +172,21 @@ exports.socketFunctions = function(socket) {
     );
   });
 
-  socket.on("getKlines", function(data) {
-    let time = data;
-    fetch("https://api.binance.com/api/v1/klines?symbol=" + data.symbol + "&interval=" + data.timeframe)
-      .then(resp => resp.json())
-      .then(info => {
-        socket.emit("getKlines", { data: info, timeframe: data.timeframe });
-      });
+  socket.on("getKlines", async function(data) {
+    try {
+      let res = await fetch("https://api.binance.com/api/v1/klines?symbol=" + data.symbol + "&interval=" + data.timeframe);
+      res = await res.json();
+      socket.emit("getKlines", { data: res, timeframe: data.timeframe });
+    } catch (err) {
+      console.log(err.name);
+    }
   });
 
   socket.on("lastOrder", async function(data) {
     const client = await authBinance();
     let account = await client.myTrades({ symbol: data.symbol, limit: "200" });
     socket.emit("lastOrder", account);
-  });
+  }); 
 
   socket.on("getAssets", async function() {
     const client = await authBinance();

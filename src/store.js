@@ -31,9 +31,29 @@ export default new Vuex.Store({
     searchTradingPairPanel: '',
     token: '',
     email: '',
-    tradingArrows: false
+    tradingArrows: false,
+    historicalDataSymbol: "",
+    historicalDataStep: 1,
+    historicalDataStartingDate: null,
+    historicalDataFinishingDate: null,
+    historicalDataTimeframe: ""
   },
   mutations: {
+    updatedhistoricalDataStartingDate(state, n) {
+      state.historicalDataStartingDate = n;
+    },
+    updatedhistoricalDataFinishingDate(state, n) {
+      state.historicalDataFinishingDate = n;
+    },
+    updatedhistoricalDataTimeframe(state, n) {
+      state.historicalDataTimeframe = n;
+    },
+    updatedHistoricalDataStep(state, n){
+      state.historicalDataStep = n;
+    },
+    updatedHistoricalDataSymbol(state, n) {
+      state.historicalDataSymbol = n;
+    },
     updatedTradingArrows(state, n) {
       state.tradingArrows = n;
     },

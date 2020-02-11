@@ -101,9 +101,10 @@ export default {
 };
 </script>
 
-<style lang="less" >
+<style lang="less" scoped>
 section {
-  height: 100%;
+   height:100%;
+   overflow-y: hidden;
 }
 
 </style>
