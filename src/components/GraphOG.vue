@@ -1,6 +1,6 @@
 <template>
-  <div class="hello">
-    <div class="graph"></div>
+  <div class="hello ">
+    <div class="graph "></div>
   </div>
 </template>
 
@@ -19,6 +19,7 @@ export default {
   },
   sockets: {
     getKlines(val) {
+      console.log(val)
       this.data = val.data;
       if ((val.timeframe == this.timeFrame || val.symbol == this.symbol) && this.change) {
         this.graph();

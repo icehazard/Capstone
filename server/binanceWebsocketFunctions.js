@@ -7,6 +7,10 @@ const User = require("./User.js");
 const jwt = require("jsonwebtoken");
 var fs = require("fs");
 
+const JSONToCSV = require("json2csv").parse;
+const { convertCSVToArray } = require("convert-csv-to-array");
+const converter = require("convert-csv-to-array");
+
 exports.socketFunctions = function(socket) {
   async function authBinance() {
     if (!socket.handshake.query.token) return Binance({ apiKey: key.apiKeyGuest, apiSecret: key.apiSecretGuest });
@@ -25,42 +29,44 @@ exports.socketFunctions = function(socket) {
   }
 
   socket.on("historicalDataBot", async function(data) {
-    const filename = "datasets/" + data.symbol + "-" + data.start + "-" + data.finish + "-" + data.timeframe + ".txt";
+    const filename = "datasets/" + data.symbol + "-" + data.start + "-" + data.finish + "-" + data.timeframe + ".csv";
 
     if (fs.existsSync(filename)) {
       fs.readFile(filename, "utf8", (err, dataa) => {
         if (err) {
-          console.error(err)
-          return
+          console.error(err);
+          return;
         }
-        console.log(new Date(data.finish).valueOf())
-      })
+        const arrayofArrays = convertCSVToArray(dataa, {type: "array"});
+        socket.emit("historicalDataBot", arrayofArrays);
+      });
     } else {
       const oneDay = 24 * 60 * 60 * 1000;
-      let endDate = new Date()
-      var dt = new Date(endDate);
-      let startDate =  dt.setDate( dt.getDate() - 3 );
-      const diffDays = Math.round(Math.abs((startDate - endDate) / oneDay));
-      console.log("TCL: exports.socketFunctions -> startDate", diffDays)
+      let now = Date.now();
+      let dt = new Date(now);
+      let then = dt.setDate(dt.getDate() - 1);
+      diffDays = Math.round(Math.abs((then - now) / oneDay));
 
-      let res = await fetch("https://api.coincap.io/v2/candles?exchange=binance&interval=m1&baseId=bitcoin&quoteId=tether&start=1581347191000&end=1581433591000");
-      res = await res.json();
-      //console.log("TCL: exports.socketFunctions -> res", res.data[0])
+      for (let x = 0; x < 1; x++) {
+        console.log("start");
+        let res = await fetch("https://api.coincap.io/v2/candles?exchange=binance&interval=m1&baseId=bitcoin&quoteId=tether&start=" + then + "&end=" + now);
+        res = await res.json();
+        if (res.error) return;
 
-      for (let x = 0; x < diffDays; x++){
-        console.log(x)
+        var csv = JSONToCSV(res.data, { fields: ["period", "open", "high", "low", "close", "volume"], header: false });
+        var arr = csv.replace(/\"/g, "");
+
+        fs.appendFile(filename, "\n", function(err) {});
+        fs.appendFile(filename, arr, function(err) {
+          if (err) throw err;
+          console.log("Saved!");
+        });
+
+        now = dt.setDate(dt.getDate() - 1);
+        then = dt.setDate(dt.getDate() - 1);
       }
-
-
-      // fs.appendFile(filename, JSON.stringify(res.data[0]), function(err) {
-      //   if (err) throw err;
-      //   console.log("Saved!");
-      // });
+      console.log("out");
     }
-
-    // console.log("TCL: exports.socketFunctions -> data", data);
-
-    socket.emit("historicalDataBot", data);
   });
 
   socket.on("getRate", async function(data) {
@@ -186,7 +192,7 @@ exports.socketFunctions = function(socket) {
     const client = await authBinance();
     let account = await client.myTrades({ symbol: data.symbol, limit: "200" });
     socket.emit("lastOrder", account);
-  }); 
+  });
 
   socket.on("getAssets", async function() {
     const client = await authBinance();

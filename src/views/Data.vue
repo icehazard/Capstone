@@ -4,10 +4,20 @@
       <v-toolbar-title class="ml-5">Algorithmic Trading </v-toolbar-title>
     </v-toolbar>
 
-    <v-tabs color="amber darken-2 " class="fill-height" background-color="grey darken-4" vertical>
+    <v-tabs  v-model="active_tab" color="amber darken-2 " class="fill-height" background-color="grey darken-4" vertical>
       <v-tab>
-        <v-icon left>mdi-account</v-icon>
+        <v-icon left>mdi-download</v-icon>
         Historical Data
+      </v-tab>
+
+      <v-tab>
+        <v-icon left>mdi-view-list</v-icon>
+        Dataset Lists
+      </v-tab>
+
+      <v-tab>
+        <v-icon left>mdi-settings-box</v-icon>
+        Stategy Bulder
       </v-tab>
 
       <v-tab-item>
@@ -41,7 +51,6 @@
                           <v-stepper-step step="3"
                             >Select Timeframe
                             <small v-if="historicalDataTimeframe">{{ historicalDataTimeframe }} </small>
-                           
                           </v-stepper-step>
                         </v-stepper-header>
                       </v-stepper>
@@ -51,12 +60,41 @@
                 </v-card-text>
                 <v-card-actions>
                   <div class="ml-auto"></div>
-                   <small class="mr-3" v-if="allValid">Ready to download</small>
+                  <small class="mr-3" v-if="allValid">Ready to download</small>
                   <v-btn color="primary" :disabled="!allValid" @click="reset()" outlined class="mr-2">
                     Download
                   </v-btn>
                 </v-card-actions>
               </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-tab-item>
+      <v-tab-item>
+        <v-container class="">
+          <v-row>
+            <v-col>
+              <Graph></Graph>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <Lists></Lists>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-tab-item>
+
+       <v-tab-item>
+        <v-container class="">
+          <v-row>
+            <v-col>
+            <StategyBuilder></StategyBuilder>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+             
             </v-col>
           </v-row>
         </v-container>
@@ -67,24 +105,34 @@
 
 <script>
 import Historical from "../bots/HistoricalData";
+import Lists from "../bots/Lists";
+import Graph from "../bots/DatasetGraph";
+import StategyBuilder from "../bots/StategyBuilder";
 
 export default {
   components: {
-    Historical
+    Historical,
+    Lists,
+    Graph,
+    StategyBuilder
   },
-  data() {
-    return {};
-  },
+    data: () => ({
+      active_tab: 1,
+      tabs: [
+        { index: 0},
+        { index: 1},
+        { index: 2}
+      ]
+    }),
   methods: {
     reset() {
-      this.$socket.client.emit("historicalDataBot", {timeframe: this.historicalDataTimeframe, symbol: this.historicalDataSymbol, start: this.historicalDataStartingDate, finish: this.historicalDataFinishingDate});
+      this.$socket.client.emit("historicalDataBot", { timeframe: this.historicalDataTimeframe, symbol: this.historicalDataSymbol, start: this.historicalDataStartingDate, finish: this.historicalDataFinishingDate });
       // this.$store.commit("updatedHistoricalDataSymbol", "");
       // this.$store.commit("updatedHistoricalDataStep", 1);
       // this.$store.commit("updatedhistoricalDataStartingDate", "");
       // this.$store.commit("updatedhistoricalDataFinishingDate", "");
       // this.$store.commit("updatedhistoricalDataTimeframe", "");
-     
-    },
+    }
   },
   computed: {
     historicalDataTimeframe() {
@@ -102,19 +150,22 @@ export default {
     historicalDataStep() {
       return this.$store.state.historicalDataStep;
     },
-    allValid(){
-      return this.historicalDataTimeframe && this.historicalDataSymbol && this.historicalDataStartingDate && this.historicalDataFinishingDate
-    },
-    
+    allValid() {
+      return this.historicalDataTimeframe && this.historicalDataSymbol && this.historicalDataStartingDate && this.historicalDataFinishingDate;
+    }
   },
-  sockets: {},
-  watch :{
-    allValid(val){
-      console.log("TCL: allValid -> val", val)
-      if (val){
+  sockets: {
+    historicalDataBot(val){
+
+    }
+  },
+  watch: {
+    allValid(val) {
+     // console.log("TCL: allValid -> val", val);
+      if (val) {
         this.$store.commit("updatedHistoricalDataStep", 4);
       }
-    },
+    }
   },
   mounted() {}
 };

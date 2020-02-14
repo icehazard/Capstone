@@ -185,7 +185,7 @@ export default {
       this.data = val;
     },
     historicalDataBot(val){
-      console.log(val)
+     // console.log(val)
     }
   },
   mounted() {

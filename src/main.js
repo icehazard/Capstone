@@ -8,7 +8,7 @@ import io from 'socket.io-client';
 import VueSocketio from 'vue-socket.io-extended';
 import VueResource from 'vue-resource';
 
-const socket = io('http://127.0.0.1:3000', {
+const socket = io('http://127.0.0.1:80', {
   query: {
     token: store.state.token
   }
