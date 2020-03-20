@@ -130,6 +130,7 @@ export default {
     },
     stopPercent() {
       if (this.idlePosition && this.tradeStopOrder != 0 && this.modify) {
+         this.$store.commit("updateStopLoss", this.tradeStopOrder);
         return this.tradeStopOrder;
       } else {
         let stop = (this.price - (this.stop / 100) * this.price).toFixed(4);

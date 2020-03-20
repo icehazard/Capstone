@@ -19,7 +19,6 @@ export default {
   },
   sockets: {
     getKlines(val) {
-      console.log(val)
       this.data = val.data;
       if ((val.timeframe == this.timeFrame || val.symbol == this.symbol) && this.change) {
         this.graph();
@@ -42,6 +41,9 @@ export default {
     },
     symbol() {
       return this.$store.state.symbol;
+    },
+    stoploss(){
+        return this.$store.state.stoploss;
     }
   },
   watch: {
@@ -464,6 +466,17 @@ export default {
 
       svg
         .append("g")
+        .append("line")
+        .style("stroke", "orange")
+        .style("opacity", "0")
+        .style("stroke-dasharray", "3, 3")
+        .attr("class", "stopLossDashedLine")
+        .attr("clip-path", "url(#ohlcClip)")
+        .attr("x1", 0)
+        .attr("x2", dim.plot.width);
+
+      svg
+        .append("g")
         .attr("class", "grid")
         .call(
           make_y_gridlines()
@@ -496,6 +509,12 @@ export default {
           y.domain(techan.scale.plot.ohlc(data).domain());
           yPercent.domain(techan.scale.plot.percent(y, accessor(data)).domain());
           yVolume.domain(techan.scale.plot.volume(data).domain());
+
+          svg
+            .select(".stopLossDashedLine")
+            .style("opacity", "100")
+            .attr("y1", y(parentThis.stoploss))
+            .attr("y2", y(parentThis.stoploss));
 
           var macdData = techan.indicator.macd()(data);
           macdScale.domain(techan.scale.plot.macd(macdData).domain());
@@ -641,6 +660,11 @@ export default {
         if (parentThis.tradingArrows == true) {
           svg.select("g.tradearrow").call(tradearrow.refresh);
         }
+
+        svg
+          .select(".stopLossDashedLine")
+          .attr("y1", y(parentThis.stoploss))
+          .attr("y2", y(parentThis.stoploss));
 
         document.getElementsByClassName("rsiStoch")[0].lastElementChild.firstElementChild.style.transform = " translate(0px, 25px)";
         document.querySelector("g.rsiStoch.indicator g.axis.left").style.transform = " translate(0px, 25px)";

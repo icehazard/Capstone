@@ -145,53 +145,53 @@ export default {
         .attr("class", "y axis")
         .call(yAxis2);
 
-        var accessor = candlestick.accessor(),
-          timestart = Date.now();
+      var accessor = candlestick.accessor(),
+        timestart = Date.now();
 
-         let data = this.data
-            .map(function(d) {
-              const timestamp = new Date(d[0]);
-              timestamp.setHours(timestamp.getHours() + 5);
-              return {
-                date: timestamp,
-                open: +d[1],
-                high: +d[2],
-                low: +d[3],
-                close: +d[4],
-                volume: +d[5]
-              };
-            })
-          .sort(function(a, b) {
-            return d3.ascending(accessor.d(a), accessor.d(b));
-          });
+      let data = this.data
+        .map(function(d) {
+          const timestamp = new Date(d[0]);
+          timestamp.setHours(timestamp.getHours());
+          return {
+            date: timestamp,
+            open: +d[1],
+            high: +d[2],
+            low: +d[3],
+            close: +d[4],
+            volume: +d[5]
+          };
+        })
+        .sort(function(a, b) {
+          return d3.ascending(accessor.d(a), accessor.d(b));
+        });
 
-        x.domain(data.map(accessor.d));
-        x2.domain(x.domain());
-        y.domain(techan.scale.plot.ohlc(data, accessor).domain());
-        y2.domain(y.domain());
-        yVolume.domain(techan.scale.plot.volume(data).domain());
+      x.domain(data.map(accessor.d));
+      x2.domain(x.domain());
+      y.domain(techan.scale.plot.ohlc(data, accessor).domain());
+      y2.domain(y.domain());
+      yVolume.domain(techan.scale.plot.volume(data).domain());
 
-        focus.select("g.candlestick").datum(data);
-        focus.select("g.volume").datum(data);
+      focus.select("g.candlestick").datum(data);
+      focus.select("g.volume").datum(data);
 
-        context
-          .select("g.close")
-          .datum(data)
-          .call(close);
-        context.select("g.x.axis").call(xAxis2);
+      context
+        .select("g.close")
+        .datum(data)
+        .call(close);
+      context.select("g.x.axis").call(xAxis2);
 
-        // Associate the brush with the scale and render the brush only AFTER a domain has been applied
-        context
-          .select("g.pane")
-          .call(brush)
-          .selectAll("rect")
-          .attr("height", height2);
+      // Associate the brush with the scale and render the brush only AFTER a domain has been applied
+      context
+        .select("g.pane")
+        .call(brush)
+        .selectAll("rect")
+        .attr("height", height2);
 
-        x.zoomable().domain(x2.zoomable().domain());
-        draw();
+      x.zoomable().domain(x2.zoomable().domain());
+      draw();
 
-        console.log("Render time: " + (Date.now() - timestart));
-  
+      console.log("Render time: " + (Date.now() - timestart));
+
       function brushed() {
         var zoomable = x.zoomable(),
           zoomable2 = x2.zoomable();
@@ -217,29 +217,28 @@ export default {
   },
   sockets: {
     historicalDataBot(val) {
-     // console.log(val);
+      d3.select(".graphHistory > svg").remove();
       this.data = val;
       this.graph();
     }
   },
   mounted() {
-    this.$socket.client.emit("historicalDataBot", {})
+    //this.$socket.client.emit("historicalDataBot", {})
   }
 };
 </script>
 
-<style >
-
+<style>
 text {
-        fill: rgb(235, 235, 235);
-    }
+  fill: rgb(235, 235, 235);
+}
 
 path.candle {
   stroke: #000000;
 }
 
 path.candle.body {
-  stroke-width: 1;
+  stroke-width: 0;
 }
 
 path.candle.up {
@@ -271,7 +270,7 @@ path.volume {
 
 path.line {
   fill: none;
-  stroke: #FB8C00;
+  stroke: #fb8c00;
   stroke-width: 1;
 }
 

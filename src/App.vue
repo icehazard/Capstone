@@ -4,20 +4,21 @@
     <v-content>
       <router-view></router-view>
     </v-content>
+    <ErrorMessages></ErrorMessages>
   </v-app>
 </template>
 
 <script>
 import MainNavBar from "./components/MainNavBar";
+import ErrorMessages from "./components/ErrorMessages";
 
 export default {
   name: "App",
   components: {
-    MainNavBar
+    MainNavBar,
+    ErrorMessages
   },
-  data: () => ({
-    //
-  })
+
 };
 </script>
 

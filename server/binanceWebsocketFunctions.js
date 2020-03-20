@@ -9,7 +9,6 @@ var fs = require("fs");
 
 const JSONToCSV = require("json2csv").parse;
 const { convertCSVToArray } = require("convert-csv-to-array");
-const converter = require("convert-csv-to-array");
 
 exports.socketFunctions = function(socket) {
   async function authBinance() {
@@ -29,44 +28,82 @@ exports.socketFunctions = function(socket) {
   }
 
   socket.on("historicalDataBot", async function(data) {
-    const filename = "datasets/" + data.symbol + "-" + data.start + "-" + data.finish + "-" + data.timeframe + ".csv";
+    if (data.filename) {
+      filename = "datasets/" + data.filename;
+    } else {
+      filename = "datasets/" + data.symbol + "-" + data.start + "-" + data.finish + "-" + data.timeframe + ".csv";
+    }
 
     if (fs.existsSync(filename)) {
       fs.readFile(filename, "utf8", (err, dataa) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        const arrayofArrays = convertCSVToArray(dataa, {type: "array"});
-        socket.emit("historicalDataBot", arrayofArrays);
+        const obj = JSON.parse(dataa);
+        socket.emit("historicalDataBot", obj);
       });
     } else {
-      const oneDay = 24 * 60 * 60 * 1000;
+      let oneDay = 24 * 60 * 60 * 1000;
       let now = Date.now();
-      let dt = new Date(now);
-      let then = dt.setDate(dt.getDate() - 1);
-      diffDays = Math.round(Math.abs((then - now) / oneDay));
+      let start = new Date(now);
+      let end = new Date(now);
+      let itta = 2;
+      let start_date = start.setDate(start.getDate() - itta);
+      let end_date = end.setDate(end.getDate() - itta + 1);
+      let diffDays = Math.round(Math.abs((start_date - end_date) / oneDay));
 
-      for (let x = 0; x < 1; x++) {
-        console.log("start");
-        let res = await fetch("https://api.coincap.io/v2/candles?exchange=binance&interval=m1&baseId=bitcoin&quoteId=tether&start=" + then + "&end=" + now);
-        res = await res.json();
-        if (res.error) return;
+      for (let x = 0; x < itta; x++) {
+        console.log("it " + x);
+        try {
+          let url = "https://api.coincap.io/v2/candles?exchange=binance&interval=m1&baseId=bitcoin&quoteId=tether&start=" + start_date + "&end=" + end_date;
+          //console.log("TCL: exports.socketFunctions -> url", url)
+          let res = await fetch(url);
+          res = await res.json();
+          if (res.error) {
+            console.log(res.error);
+            // x = x - 1;
+            //
+            //end = new Date(end_date);
+            //end = end.setDate(end.getHours() - 1);
+            console.log("TCL: exports.socketFunctions -> end", end);
+          }
+          let aarra = [];
 
-        var csv = JSONToCSV(res.data, { fields: ["period", "open", "high", "low", "close", "volume"], header: false });
-        var arr = csv.replace(/\"/g, "");
+          for (let x of res.data) {
+            aarra.push([x.period, parseFloat(x.open), parseFloat(x.high), parseFloat(x.low), parseFloat(x.close), parseFloat(x.volume)]);
+          }
 
-        fs.appendFile(filename, "\n", function(err) {});
-        fs.appendFile(filename, arr, function(err) {
-          if (err) throw err;
-          console.log("Saved!");
-        });
+          fs.appendFile(filename, JSON.stringify(aarra), function(err) {
+            if (err) throw err;
+            socket.emit("historyPercentage", Math.round(((x + 1) / itta) * 100));
+          });
+          start_date = start.setDate(start.getDate() + 1);
 
-        now = dt.setDate(dt.getDate() - 1);
-        then = dt.setDate(dt.getDate() - 1);
+          end_date = end.setDate(end.getDate() + 1);
+          // console.log("second", end_date);
+          // end_date = end.setDate(end.getHours() - 22);
+          // console.log("first", end_date);
+        } catch (err) {
+          console.log("err");
+        }
       }
-      console.log("out");
+
+      fs.readFile(filename, "utf8", (err, dataa) => {
+        dataa = dataa.replace(/"/g, "");
+        dataa = dataa.replace(/\[\]/g, "");
+        dataa = dataa.replace(/\]\[/g, ",");
+
+        fs.writeFile(filename, dataa, function(err) {
+          if (err) console.log(err);
+          console.log("done");
+        });
+      });
     }
+  });
+
+  socket.on("listofdatasets", async function(data) {
+    fs.readdir("datasets", (err, files) => {
+      files.forEach(file => {
+        socket.emit("listofdatasets", file);
+      });
+    });
   });
 
   socket.on("getRate", async function(data) {
@@ -204,6 +241,7 @@ exports.socketFunctions = function(socket) {
   });
 
   socket.on("sell", async function(dump) {
+   
     console.log("TCL: exports.socketFunctions -> dump.asset", dump.asset);
     const client = await authBinance();
     let crypto = (parseFloat(dump.asset) * 0.99).toFixed(2);
@@ -217,7 +255,13 @@ exports.socketFunctions = function(socket) {
       })
       .catch(error => {
         console.log(error);
+        if (error.code == -1013){
+          socket.emit("errorMsg", {message:"Insufficient funds", type: "Error"});
+        }
+        
+        
       });
+     
 
     socket.emit("sell", crypto);
   });

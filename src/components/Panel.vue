@@ -6,6 +6,7 @@
     <TradingValues></TradingValues>
     <TradeButtons></TradeButtons>
     <LastOrderTable></LastOrderTable>
+
   </main>
 </template>
 
@@ -25,7 +26,8 @@ export default {
     Assets,
     TradeButtons,
     LastOrderTable
-  }
+  },
+
 };
 </script>
 

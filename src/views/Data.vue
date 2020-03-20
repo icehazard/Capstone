@@ -4,7 +4,7 @@
       <v-toolbar-title class="ml-5">Algorithmic Trading </v-toolbar-title>
     </v-toolbar>
 
-    <v-tabs  v-model="active_tab" color="amber darken-2 " class="fill-height" background-color="grey darken-4" vertical>
+    <v-tabs v-model="active_tab" color="amber darken-2 " class="fill-height" background-color="grey darken-4" vertical>
       <v-tab>
         <v-icon left>mdi-download</v-icon>
         Historical Data
@@ -58,10 +58,11 @@
                   </v-row>
                   <Historical></Historical>
                 </v-card-text>
-                <v-card-actions>
+                <v-card-actions class="">
                   <div class="ml-auto"></div>
-                  <small class="mr-3" v-if="allValid">Ready to download</small>
-                  <v-btn color="primary" :disabled="!allValid" @click="reset()" outlined class="mr-2">
+                  <v-progress-linear v-model="percentage"  height="5" reactive class="mx-10"></v-progress-linear>
+                  <small class="mr-8" v-if="allValid">{{percentage}}%</small>
+                  <v-btn color="primary" :disabled="!allValid" @click="reset()" outlined class="mx-2">
                     Download
                   </v-btn>
                 </v-card-actions>
@@ -85,17 +86,15 @@
         </v-container>
       </v-tab-item>
 
-       <v-tab-item>
+      <v-tab-item>
         <v-container class="">
           <v-row>
             <v-col>
-            <StategyBuilder></StategyBuilder>
+              <StategyBuilder></StategyBuilder>
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
-             
-            </v-col>
+            <v-col> </v-col>
           </v-row>
         </v-container>
       </v-tab-item>
@@ -116,18 +115,17 @@ export default {
     Graph,
     StategyBuilder
   },
-    data: () => ({
-      active_tab: 1,
-      tabs: [
-        { index: 0},
-        { index: 1},
-        { index: 2}
-      ]
-    }),
+  data: () => ({
+    percentage: 0,
+    active_tab: 1,
+    tabs: [{ index: 0 }, { index: 1 }, { index: 2 }]
+  }),
   methods: {
     reset() {
+      this.percentage = 0;
       this.$socket.client.emit("historicalDataBot", { timeframe: this.historicalDataTimeframe, symbol: this.historicalDataSymbol, start: this.historicalDataStartingDate, finish: this.historicalDataFinishingDate });
-      // this.$store.commit("updatedHistoricalDataSymbol", "");
+      
+     // this.$store.commit("updatedHistoricalDataSymbol", "");
       // this.$store.commit("updatedHistoricalDataStep", 1);
       // this.$store.commit("updatedhistoricalDataStartingDate", "");
       // this.$store.commit("updatedhistoricalDataFinishingDate", "");
@@ -155,13 +153,17 @@ export default {
     }
   },
   sockets: {
-    historicalDataBot(val){
-
+    historicalDataBot(val) {},
+    historyPercentage(val) {
+      this.percentage = val;
+       if (val == 100){
+         this.$socket.client.emit("listofdatasets");
+       }
     }
   },
   watch: {
     allValid(val) {
-     // console.log("TCL: allValid -> val", val);
+      // console.log("TCL: allValid -> val", val);
       if (val) {
         this.$store.commit("updatedHistoricalDataStep", 4);
       }
