@@ -33,6 +33,9 @@ export default {
     }
   },
   computed: {
+    stopAndPriceLines() {
+      return this.$store.state.stopAndPriceLines;
+    },
     tradingArrows() {
       return this.$store.state.tradingArrows;
     },
@@ -42,8 +45,14 @@ export default {
     symbol() {
       return this.$store.state.symbol;
     },
-    stoploss(){
-        return this.$store.state.stoploss;
+    stoploss() {
+      return this.$store.state.stoploss;
+    },
+    price() {
+      return this.$store.state.price;
+    },
+    stopLoss() {
+      return this.$store.state.setStopLossOnGraphMode;
     }
   },
   watch: {
@@ -418,6 +427,16 @@ export default {
 
       ohlcSelection.append("g").attr("class", "volume axis");
 
+      svg
+        .append("g")
+        .attr("class", "grid")
+        .style("opacity", "0")
+        .call(
+          make_y_gridlines()
+            .tickSize(-dim.plot.width)
+            .tickFormat("")
+        );
+
       var indicatorSelection = svg
         .selectAll("svg > g.indicator")
         .data(["macd", "rsi", "rsiStoch"])
@@ -477,12 +496,28 @@ export default {
 
       svg
         .append("g")
-        .attr("class", "grid")
-        .call(
-          make_y_gridlines()
-            .tickSize(-dim.plot.width)
-            .tickFormat("")
-        );
+        .append("line")
+        .style("stroke", "#00b8d4")
+        .style("opacity", "0")
+        .style("stroke-dasharray", "3, 3")
+        .attr("class", "livePriceLine")
+        .attr("clip-path", "url(#ohlcClip)")
+        .attr("x1", 0)
+        .attr("x2", dim.plot.width);
+
+      //mousemove
+      // svg.on("click", function() {
+      //   console.log("graph -> x", y.invert(d3.mouse(this)[1]));
+      // });
+
+      svg.on("click", function() {
+            if (parentThis.stopLoss == true) {
+              console.log("Setting Stop Loss");
+
+              console.log("graph -> x", y.invert(d3.mouse(this)[1]));
+              parentThis.$store.commit("updatedSetStopLossOnGraphMode", y.invert(d3.mouse(this)[1]));
+            }
+          });
 
       this.interval = setInterval(() => {
         if (this.data[0]) {
@@ -510,18 +545,14 @@ export default {
           yPercent.domain(techan.scale.plot.percent(y, accessor(data)).domain());
           yVolume.domain(techan.scale.plot.volume(data).domain());
 
-          svg
-            .select(".stopLossDashedLine")
-            .style("opacity", "100")
-            .attr("y1", y(parentThis.stoploss))
-            .attr("y2", y(parentThis.stoploss));
-
           var macdData = techan.indicator.macd()(data);
           macdScale.domain(techan.scale.plot.macd(macdData).domain());
           var rsiData = techan.indicator.rsi()(data);
           var rsiStochData = JSON.parse(JSON.stringify(rsiData));
           rsiScale.domain(techan.scale.plot.rsi(rsiData).domain());
           rsiStochScale.domain(techan.scale.plot.rsi(rsiStochData).domain());
+
+          svg.select(".grid").style("opacity", "1");
 
           if (parentThis.tradeHistory != [] && parentThis.tradingArrows == true) {
             var trades = [];
@@ -538,6 +569,11 @@ export default {
           }
           if (parentThis.tradingArrows == false) {
             d3.select("g.tradearrow > g.data").remove();
+          }
+
+          if (parentThis.stopAndPriceLines == false) {
+            d3.select(".livePriceLine").style("opacity", "0");
+            d3.select(".stopLossDashedLine").style("opacity", "0");
           }
 
           let collection = [];
@@ -599,6 +635,8 @@ export default {
           svg.select("g.crosshair.rsi").call(rsiCrosshair);
           svg.select("g.crosshair.rsiStoch").call(rsiStochCrosshair);
 
+          
+
           if (!t) {
             zoomableInit = x
               .zoomable()
@@ -657,14 +695,24 @@ export default {
         svg.select("g.crosshair.ohlc").call(ohlcCrosshair);
         svg.select("g.crosshair.macd").call(macdCrosshair);
         svg.select("g.crosshair.rsiStoch").call(rsiStochCrosshair);
+
         if (parentThis.tradingArrows == true) {
           svg.select("g.tradearrow").call(tradearrow.refresh);
         }
 
-        svg
-          .select(".stopLossDashedLine")
-          .attr("y1", y(parentThis.stoploss))
-          .attr("y2", y(parentThis.stoploss));
+        if (parentThis.stopAndPriceLines == true) {
+          svg
+            .select(".livePriceLine")
+            .style("opacity", "0.55")
+            .attr("y1", y(parentThis.price))
+            .attr("y2", y(parentThis.price));
+
+          svg
+            .select(".stopLossDashedLine")
+            .style("opacity", "0.5")
+            .attr("y1", y(parentThis.stoploss))
+            .attr("y2", y(parentThis.stoploss));
+        }
 
         document.getElementsByClassName("rsiStoch")[0].lastElementChild.firstElementChild.style.transform = " translate(0px, 25px)";
         document.querySelector("g.rsiStoch.indicator g.axis.left").style.transform = " translate(0px, 25px)";
@@ -851,7 +899,7 @@ path.zero {
 }
 
 .tradearrow path.buy {
-  fill: #4caf50;
+  fill: #00b8d4;
 }
 
 .tradearrow path.sell {

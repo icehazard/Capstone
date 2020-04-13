@@ -1,5 +1,5 @@
 <template>
-    <v-layout mt-3 class="btn_panel">
+    <v-layout mt-2 class="btn_panel">
       <v-flex>
         <v-card class="ma-1">
           <v-card-text class="pa-2">

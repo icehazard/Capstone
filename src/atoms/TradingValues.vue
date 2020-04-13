@@ -1,5 +1,5 @@
 <template>
-  <div class="btn_panel mt-3">
+  <div class="btn_panel mt-2">
     <v-layout class="btn_panel">
       <v-flex>
         <v-card class="ma-1">
@@ -13,7 +13,7 @@
       </v-flex>
 
       <v-flex>
-        <v-card class="ma-1">
+        <v-card class="ma-1" @click="setStopLoss()">
           <v-card-text class="pa-2">
             Stop
           </v-card-text>
@@ -108,6 +108,12 @@ export default {
       if(!entry) return;
       this.bought = Number(Number(entry.price).toFixed(4));
     }
+  },
+  methods: {
+    setStopLoss(){
+       this.$store.commit("updatedSetStopLossOnGraphMode", true);
+    }
+
   },
   computed: {
     boughtLable() {

@@ -32,13 +32,18 @@ export default new Vuex.Store({
     token: '',
     email: '',
     tradingArrows: false,
+    stopAndPriceLines: false,
     historicalDataSymbol: "",
     historicalDataStep: 1,
     historicalDataStartingDate: null,
     historicalDataFinishingDate: null,
-    historicalDataTimeframe: ""
+    historicalDataTimeframe: "",
+    setStopLossOnGraphMode: false
   },
   mutations: {
+    updatedSetStopLossOnGraphMode(state, n) {
+      state.setStopLossOnGraphMode = n;
+    },
     updatedhistoricalDataStartingDate(state, n) {
       state.historicalDataStartingDate = n;
     },
@@ -56,6 +61,9 @@ export default new Vuex.Store({
     },
     updatedTradingArrows(state, n) {
       state.tradingArrows = n;
+    },
+    updatedStopAndPriceLines(state, n) {
+      state.stopAndPriceLines = n;
     },
     updatesEmail(state, n) {
       state.email = n;

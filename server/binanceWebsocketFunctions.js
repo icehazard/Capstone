@@ -213,6 +213,7 @@ exports.socketFunctions = function(socket) {
           console.log(error);
         })
     );
+    socket.emit("stoploss", "okay");
   });
 
   socket.on("getKlines", async function(data) {
@@ -227,7 +228,7 @@ exports.socketFunctions = function(socket) {
 
   socket.on("lastOrder", async function(data) {
     const client = await authBinance();
-    let account = await client.myTrades({ symbol: data.symbol, limit: "200" });
+    let account = await client.myTrades({ symbol: data.symbol, limit: "500" });
     socket.emit("lastOrder", account);
   });
 

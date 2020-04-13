@@ -1,10 +1,13 @@
 <template>
-  <v-layout mt-3 mr-3>
+<v-layout mt-2 class="btn_panel">
     <v-flex>
-      <v-data-table dense hide-default-footer :headers="headers" :items="data" class="elevation-1"></v-data-table>
+        <v-card>
+            <v-data-table dense hide-default-footer :headers="headers" :items="data" class="elevation-1"></v-data-table>
+        </v-card>
     </v-flex>
-  </v-layout>
+</v-layout>
 </template>
+
 
 <script>
 export default {

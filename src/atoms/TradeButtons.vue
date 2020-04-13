@@ -1,5 +1,5 @@
 <template>
-  <v-layout mt-3 class="btn_panel">
+  <v-layout mt-2 class="btn_panel">
     <v-btn :disabled="idlePosition" outlined width="80px" @click="buy" color="green" class="ma-1">Buy</v-btn>
     <v-btn :disabled="!idlePosition" outlined width="80px" @click="sell" color="red" class="ma-1">Sell</v-btn>
     <v-btn :disabled="!idlePosition" outlined width="80px" @click="modify" color="primary" class="ma-1">Modify</v-btn>
@@ -91,11 +91,12 @@ export default {
       this.$socket.client.emit("lastOrder", {symbol: this.$store.state.symbol});
     },
     openOrders(val) {
+      console.log("openME")
       for (let x in val) {
         if (val[x].type == "LIMIT_MAKER") {
           this.$store.commit("updatetradelimitOrder", Number(val[x].price).toFixed(4));
         } else if (val[x].type == "STOP_LOSS_LIMIT") {
-          this.$store.commit("updatetradeStopOrder", Number(val[x].stopPrice).toFixed(4));
+         this.$store.commit("updatetradeStopOrder", Number(val[x].stopPrice).toFixed(4));
         }
       }
     },

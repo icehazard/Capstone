@@ -1,5 +1,5 @@
 <template>
-  <v-layout mt-3 class="asset_panel">
+  <v-layout class="asset_panel">
     <section class="ma-1" v-for="asset in assets" :key="asset.asset">
       <v-card>
         <v-card-text class="pa-2">
