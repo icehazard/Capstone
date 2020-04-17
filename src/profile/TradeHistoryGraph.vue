@@ -25,7 +25,7 @@ export default {
   methods: {},
   sockets: {
     lastOrder(val) {
-      val = val.slice(val.length - 200, val.length);
+      val = val.slice(val.length - 50, val.length);
       let object = val;
       this.value = [];
 

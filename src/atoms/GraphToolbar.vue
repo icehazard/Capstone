@@ -28,7 +28,6 @@ export default {
     toggle_exclusive(val) {
       this.$store.commit("updatedTradingArrows", val.includes("tradearrow"));
       this.$store.commit("updatedStopAndPriceLines", val.includes("line"));
-      console.log(val.includes("line"))
     }
   },
   computed: {

@@ -2,7 +2,7 @@
   <div class="btn_panel mt-2">
     <v-layout class="btn_panel">
       <v-flex>
-        <v-card class="ma-1">
+        <v-card width="103px" class="ma-1">
           <v-card-text class="pa-2">
             {{ boughtLable }}
           </v-card-text>
@@ -13,7 +13,7 @@
       </v-flex>
 
       <v-flex>
-        <v-card class="ma-1" @click="setStopLoss()">
+        <v-card width="103px" class="ma-1" >
           <v-card-text class="pa-2">
             Stop
           </v-card-text>
@@ -24,7 +24,7 @@
       </v-flex>
 
       <v-flex>
-        <v-card class="ma-1">
+        <v-card width="103px" class="ma-1">
           <v-card-text class="pa-2">
             Percentage
           </v-card-text>
@@ -35,7 +35,7 @@
       </v-flex>
 
       <v-flex>
-        <v-card class="ma-1">
+        <v-card width="103px" class="ma-1">
           <v-card-text class="pa-2">
             Target
           </v-card-text>

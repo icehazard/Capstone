@@ -91,7 +91,6 @@ export default {
       this.$socket.client.emit("lastOrder", {symbol: this.$store.state.symbol});
     },
     openOrders(val) {
-      console.log("openME")
       for (let x in val) {
         if (val[x].type == "LIMIT_MAKER") {
           this.$store.commit("updatetradelimitOrder", Number(val[x].price).toFixed(4));

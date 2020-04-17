@@ -2,17 +2,16 @@
   <main>
     <Assets></Assets>
     <PriceTicker></PriceTicker>
-    <IndicatorValues></IndicatorValues>
+    <ActionButtons></ActionButtons>
     <TradingValues></TradingValues>
     <TradeButtons></TradeButtons>
     <LastOrderTable></LastOrderTable>
-
   </main>
 </template>
 
 <script>
 import PriceTicker from "../atoms/PriceTicker";
-import IndicatorValues from "../atoms/IndicatorValues";
+import ActionButtons from "../atoms/ActionButtons";
 import TradingValues from "../atoms/TradingValues";
 import Assets from "../atoms/Assets";
 import TradeButtons from "../atoms/TradeButtons";
@@ -21,13 +20,12 @@ import LastOrderTable from "../atoms/LastOrderTable";
 export default {
   components: {
     PriceTicker,
-    IndicatorValues,
+    ActionButtons,
     TradingValues,
     Assets,
     TradeButtons,
-    LastOrderTable
+    LastOrderTable,
   },
-
 };
 </script>
 

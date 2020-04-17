@@ -39,11 +39,6 @@ export default {
       this.$socket.client.emit("getAssets");
       console.log("TCL: logout -> val.success", "Log out");
     }
-  },
-  sockets: {
-    errorMsg(val) {
-      console.log(val)
-    }
   }
 };
 </script>

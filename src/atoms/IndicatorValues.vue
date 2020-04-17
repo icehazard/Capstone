@@ -1,7 +1,7 @@
 <template>
     <v-layout mt-2 class="btn_panel">
       <v-flex>
-        <v-card class="ma-1">
+        <v-card color="grey darken-4" class="ma-1">
           <v-card-text class="pa-2">
             MacD
           </v-card-text>
@@ -11,7 +11,7 @@
         </v-card>
       </v-flex>
       <v-flex>
-        <v-card class="ma-1">
+        <v-card color="grey darken-4" class="ma-1">
           <v-card-text class="pa-2">
             RSI
           </v-card-text>
@@ -21,7 +21,7 @@
         </v-card>
       </v-flex>
       <v-flex>
-        <v-card class="ma-1">
+        <v-card color="grey darken-4" class="ma-1">
           <v-card-text class="pa-2">
             Stoch RSI
           </v-card-text>
@@ -31,7 +31,7 @@
         </v-card>
       </v-flex>
       <v-flex>
-        <v-card class="ma-1">
+        <v-card color="grey darken-4" class="ma-1">
           <v-card-text class="pa-2">
             EMA
           </v-card-text>

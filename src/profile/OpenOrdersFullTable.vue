@@ -40,7 +40,7 @@
         </template>
         <template v-slot:item.action="{ item }">
           <v-icon small class="mr-2" @click="editItem(item)">
-            Cancel
+            mdi mdi-trash-can
           </v-icon>
         </template>
         <template v-slot:no-data>

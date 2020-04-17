@@ -260,9 +260,9 @@ export default {
 </script>
 
 <style>
-.graph {
-	//background-color: #303030;
-}
+/* .graph {
+	background-color: #303030;
+} */
 
 body {
 	font: 10px sans-serif;

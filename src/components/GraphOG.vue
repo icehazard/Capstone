@@ -13,7 +13,7 @@ export default {
       interval: null,
       emitInterval: null,
       change: false,
-      intervalFrequency: 500,
+      intervalFrequency: 1000,
       tradeHistory: []
     };
   },
@@ -929,7 +929,7 @@ path.zero {
 }
 
 .graph {
-  height: 100vh;
+  height: 100%;
 }
 
 .line {

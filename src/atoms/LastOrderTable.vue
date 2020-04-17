@@ -1,8 +1,8 @@
 <template>
 <v-layout mt-2 class="btn_panel">
     <v-flex>
-        <v-card>
-            <v-data-table dense hide-default-footer :headers="headers" :items="data" class="elevation-1"></v-data-table>
+        <v-card height="128px" >
+            <v-data-table dense hide-default-footer :headers="headers" :items="data" class="elevation-0"></v-data-table>
         </v-card>
     </v-flex>
 </v-layout>

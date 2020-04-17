@@ -1,6 +1,7 @@
 <template>
   <section>
-    <v-snackbar v-model="snackbar" :color="color" class="">
+    <v-snackbar v-model="snackbar" color="grey darken-3" class="">
+      <v-icon class="mr-2">mdi mdi-av-timer</v-icon>
       {{ text }}
       <v-btn color="primary" text @click="snackbar = false">
         Close
@@ -17,6 +18,7 @@
         <v-card-title class="headline grey darken-1" primary-title>
           Stop-Loss
         </v-card-title>
+         <hr class="primary">
         <v-card-text class="mt-8 mb-4">
           Are you sure you wish to change the Stop-Loss level to {{stop | formatter}}
         </v-card-text>
@@ -41,7 +43,7 @@ export default {
     snackbar: false,
     text: "",
     type: "",
-    color: "grey darken-2",
+    color: "grey darken-3",
     dialog: false
   }),
   filters: {

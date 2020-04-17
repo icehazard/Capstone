@@ -100,10 +100,63 @@ exports.socketFunctions = function(socket) {
 
   socket.on("listofdatasets", async function(data) {
     fs.readdir("datasets", (err, files) => {
-      files.forEach(file => {
+      files.forEach((file) => {
         socket.emit("listofdatasets", file);
       });
     });
+  });
+
+  socket.on("addAlerts", async function(dump) {
+    socket.emit("clientMessage", { message: "Alert Has Been Created", type: true });
+  });
+
+  socket.on("removeAlerts", async function(dump) {
+    socket.emit("clientMessage", { message: "Conditions for one of your alerts has been met", type: true });
+  });
+
+  socket.on("homeOrder", async function(dump) {
+    let res = await fetch("https://api.coincap.io/v2/assets");
+    res = await res.json();
+    socket.emit("homeOrder", res);
+  });
+
+  socket.on("pairs", async function(dump) {
+    const client = await authBinance();
+    let res = await client.dailyStats();
+    socket.emit("pairs", res);
+  });
+
+  // socket.on("openOrders", async function(dump) {
+  //   const client = await authBinance();
+  // });
+
+  socket.on("getKlines", async function(data) {
+    try {
+      let url = "https://api.binance.com/api/v3/klines?symbol=" + data.symbol + "&interval=" + data.timeframe;
+      let res = await fetch(url);
+      // console.log("exports.socketFunctions -> res", res)
+      res = await res.json();
+      //console.log("exports.socketFunctions -> res", res)
+      socket.emit("getKlines", { data: res, timeframe: data.timeframe });
+    } catch (err) {
+      console.log("Server Error: Could Not Fetch Data");
+      socket.emit("clientMessage", { message: "Server Error: Could Not Fetch Kline Data", type: false });
+    }
+  });
+
+  socket.on("lastOrder", async function(data) {
+    const client = await authBinance();
+    let account = await client.myTrades({ symbol: data.symbol, limit: "500" });
+    socket.emit("lastOrder", account);
+  });
+
+  socket.on("getAssets", async function() {
+    const client = await authBinance();
+    let a = await client.accountInfo();
+    let b = a.balances.filter((item) => {
+      return item.free > 0 || item.locked > 0;
+    });
+    socket.emit("getAssets", b);
   });
 
   socket.on("getRate", async function(data) {
@@ -117,7 +170,7 @@ exports.socketFunctions = function(socket) {
       return data[el].usd;
     }
 
-    const promises = array1.map(async idx => {
+    const promises = array1.map(async (idx) => {
       return await getRate(idx);
     });
 
@@ -125,13 +178,14 @@ exports.socketFunctions = function(socket) {
     socket.emit("getRate", data);
   });
 
-  socket.on("homeOrder", async function(dump) {
-    let res = await fetch("https://api.coincap.io/v2/assets");
-    res = await res.json();
-    socket.emit("homeOrder", res);
-  });
-
   socket.on("CancelAllOrder", async function(dump) {
+    async function cancel(idc) {
+      return await client.cancelOrder({
+        symbol: idx.symbol,
+        orderId: idx.orderId,
+      });
+    }
+
     let arrayOrders = [];
     const user = await auth();
     const client = await authBinance();
@@ -142,25 +196,22 @@ exports.socketFunctions = function(socket) {
     let url = burl + endPoint + "?" + dataQueryString + "&signature=" + signature;
     let res = await fetch(url, { method: "GET", headers: { "X-MBX-APIKEY": user.apiKey } });
     res = await res.json();
-    console.log("TCL: exports.socketFunctions -> res", res);
+    console.log("** CANCELALLORDER** Cancelling orders");
 
-    for (x in res) {
-      // arrayOrders.push(res[x].orderId)
-      console.log(
-        await client.cancelOrder({
-          symbol: res[x].symbol,
-          orderId: res[x].orderId
-        })
-      );
-    }
-    console.log("TCL: exports.socketFunctions -> res", arrayOrders);
+    // for (x in res) {
+    //   await client.cancelOrder({
+    //     symbol: res[x].symbol,
+    //     orderId: res[x].orderId,
+    //   });
+    // }
+
+    const promises = res.map(async (idx) => {
+      return await cancel(idx);
+    });
+
+    await Promise.all(promises);
+    console.log("** CANCELALLORDER2** Orders Have been Canceled");
     socket.emit("CancelAllOrder", arrayOrders);
-  });
-
-  socket.on("pairs", async function(dump) {
-    const client = await authBinance();
-    let res = await client.dailyStats();
-    socket.emit("pairs", res);
   });
 
   socket.on("openOrders", async function(data) {
@@ -177,7 +228,6 @@ exports.socketFunctions = function(socket) {
 
   socket.on("oco", async function(dump) {
     const user = await auth();
-    console.log("OCO");
     let quantity = (parseFloat(dump.asset) * 0.99).toFixed(2);
     let price = dump.target;
     let burl = "https://api.binance.com";
@@ -188,118 +238,91 @@ exports.socketFunctions = function(socket) {
     let url = burl + endPoint + "?" + dataQueryString + "&signature=" + signature;
     let res = await fetch(url, { method: "POST", headers: { "X-MBX-APIKEY": user.apiKey } });
     res = await res.json();
-    console.log("TCL: exports.socketFunctions -> res", res);
-    socket.emit("oco", res);
-  });
 
-  socket.on("openOrders", async function(dump) {
-    const client = await authBinance();
-  });
-
-  socket.on("stoploss", async function(dump) {
-    console.log(dump);
-    const client = await authBinance();
-    console.log(
-      await client
-        .order({
-          symbol: dump.symbol,
-          side: "SELL",
-          type: "STOP_LOSS_LIMIT",
-          quantity: (parseFloat(Number(dump.asset)) * 0.99).toFixed(2),
-          price: Number(dump.stoploss - 0.0002).toFixed(4),
-          stopPrice: dump.stoploss
-        })
-        .catch(error => {
-          console.log(error);
-        })
-    );
-    socket.emit("stoploss", "okay");
-  });
-
-  socket.on("getKlines", async function(data) {
-    try {
-      let res = await fetch("https://api.binance.com/api/v1/klines?symbol=" + data.symbol + "&interval=" + data.timeframe);
-      res = await res.json();
-      socket.emit("getKlines", { data: res, timeframe: data.timeframe });
-    } catch (err) {
-      console.log(err.name);
+    if (res.code != -1013) {
+      socket.emit("oco", res);
+      socket.emit("clientMessage", { message: "Activation: OCO has been set", type: true });
+      console.log("**OCO** Activation: OCO has been set");
+    } else {
+      socket.emit("clientMessage", { message: "Insufficient Funds: Could Not Complete OCO", type: false });
+      console.log("**OCO** Insufficient Funds: Could Not Complete OCO");
     }
   });
 
-  socket.on("lastOrder", async function(data) {
+  socket.on("stoploss", async function(dump) {
     const client = await authBinance();
-    let account = await client.myTrades({ symbol: data.symbol, limit: "500" });
-    socket.emit("lastOrder", account);
-  });
-
-  socket.on("getAssets", async function() {
-    const client = await authBinance();
-    let a = await client.accountInfo();
-    let b = a.balances.filter(item => {
-      return item.free > 0 || item.locked > 0;
-    });
-    socket.emit("getAssets", b);
+    try {
+      await client.order({
+        symbol: dump.symbol,
+        side: "SELL",
+        type: "STOP_LOSS_LIMIT",
+        quantity: (parseFloat(Number(dump.asset)) * 0.99).toFixed(2),
+        price: Number(dump.stoploss - 0.0002).toFixed(4),
+        stopPrice: dump.stoploss,
+      });
+      socket.emit("clientMessage", { message: "Successful Changed Stop Loss", type: true });
+      console.log("**STOPLOSS** Successful Changed Stop Loss");
+    } catch (e) {
+      socket.emit("clientMessage", { message: "Insufficient Funds: Could Not Change Stoploss", type: false });
+      console.log("**STOPLOSS** Insufficient Funds: Could Not Change Stoploss");
+    }
   });
 
   socket.on("sell", async function(dump) {
-   
-    console.log("TCL: exports.socketFunctions -> dump.asset", dump.asset);
     const client = await authBinance();
     let crypto = (parseFloat(dump.asset) * 0.99).toFixed(2);
-
-    await client
-      .order({
+    try {
+      await client.order({
         symbol: dump.symbol,
         side: "SELL",
         quantity: crypto,
-        type: "MARKET"
-      })
-      .catch(error => {
-        console.log(error);
-        if (error.code == -1013){
-          socket.emit("errorMsg", {message:"Insufficient funds", type: "Error"});
-        }
-        
-        
+        type: "MARKET",
       });
-     
-
-    socket.emit("sell", crypto);
+      socket.emit("clientMessage", { message: "Short: Trade Successful", type: true });
+      socket.emit("sell", crypto);
+      console.log("**SELL** Trade Successful");
+    } catch (e) {
+      socket.emit("clientMessage", { message: "Insufficient Funds: Could Not Sell", type: false });
+      console.log("**SELL** Insufficient Funds: Could Not Sell");
+    }
   });
 
   socket.on("buy", async function(dump) {
     const client = await authBinance();
     let amount = ((dump.usdt / dump.price) * 0.99).toFixed(2);
-    await client
-      .order({
+    try {
+      await client.order({
         symbol: dump.symbol,
         side: "BUY",
         quantity: amount,
-        type: "MARKET"
-      })
-      .catch(error => {
-        console.log(error);
+        type: "MARKET",
       });
-    socket.emit("buy", { target: dump.target, price: dump.price });
+      socket.emit("clientMessage", { message: "Long: Trade Successful", type: true });
+      socket.emit("buy", { target: dump.target, price: dump.price });
+      console.log("**BUY** Trade Successful");
+    } catch (e) {
+      socket.emit("clientMessage", { message: "Insufficient Funds: Could Not Buy", type: false });
+      console.log("**BUY** Insufficient Funds: Could Not Buy");
+    }
   });
 
   socket.on("limit", async function(dump) {
     const client = await authBinance();
     let amount = ((dump.usdt / dump.price) * 0.99).toFixed(2);
-    console.log(
-      await client
-        .order({
-          symbol: dump.symbol,
-          side: "BUY",
-          quantity: amount,
-          type: "LIMIT",
-          price: dump.price
-          //TimeInForce: "GTC"
-        })
-        .catch(error => {
-          console.log(error);
-        })
-    );
-    socket.emit("buy", "LONG");
+    try {
+      await client.order({
+        symbol: dump.symbol,
+        side: "BUY",
+        quantity: amount,
+        type: "LIMIT",
+        price: dump.price,
+      });
+      //socket.emit("buy", "LONG");
+      socket.emit("clientMessage", { message: "Limit Has Been Set", type: true });
+      console.log("**LIMIT** Limit Has Been Set");
+    } catch (e) {
+      socket.emit("clientMessage", { message: "Error: Limit Could Not Be Set", type: false });
+      console.log("**LIMIT** Error: Limit Could Not Be Set");
+    }
   });
 };

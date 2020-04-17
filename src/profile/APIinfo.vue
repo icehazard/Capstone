@@ -12,7 +12,7 @@
         <div class="text--primary">
           {{ apiKeyServer }}
         </div>
-        <p class="mt-5">Public Key</p>
+        <p class="mt-5">Private Key</p>
         <div class="text--primary">
           {{ apiKeySecretServer }}
         </div>
