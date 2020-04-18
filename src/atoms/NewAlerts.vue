@@ -3,7 +3,7 @@
     <v-dialog v-model="dialog" persistent max-width="600px">
       <v-card>
         <v-card-title class="headline grey darken-1">
-          <span class="headline my-5">Create Alert on {{ this.$store.state.symbol }}</span>
+          <span class="headline my-2">Create Alert on {{ this.$store.state.symbol }}</span>
         </v-card-title>
         <!-- <hr class=" " /> -->
         <v-tabs centered color="primary" grow>
@@ -69,17 +69,17 @@
                     </v-col>
                   </v-row>
                   <!-- <v-row class="mt-n5">
-              <v-col sm="4"> </v-col>
-              <v-col sm="8">
-                <v-slider value="50"></v-slider>
-              </v-col>
-            </v-row> -->
+                    <v-col sm="4"> </v-col>
+                    <v-col sm="8">
+                      <v-slider value="50"></v-slider>
+                    </v-col>
+                  </v-row> -->
                 </v-container>
               </v-card-text>
             </v-card>
           </v-tab-item>
 
-          <v-tab-item class="" value="tab-2">
+          <v-tab-item class="samehight" value="tab-2">
             <Exisiting />
           </v-tab-item>
         </v-tabs>
@@ -101,7 +101,7 @@
             @click="
               //dialog = false;
               //$emit('closeDialog');
-              values();
+              values()
             "
             >Save</v-btn
           >
@@ -112,12 +112,11 @@
 </template>
 
 <script>
-
-import Exisiting from './ExistingAlerts'
+import Exisiting from "./ExistingAlerts";
 
 export default {
   components: {
-    Exisiting
+    Exisiting,
   },
   data: () => ({
     dialog: false,
@@ -127,22 +126,14 @@ export default {
     alertObject: {},
   }),
   props: ["alert"],
-  mounted() {
-  },
+  mounted() {},
   methods: {
     values() {
       this.alertObjet = { type: this.type, condition: this.condition, value: Number(this.value) };
-      //let modifiedAlerts = this.existingAlerts.push(this.alertObjet);
-      //console.log("values -> this.type", this.type)
-
-
-      // this.$store.commit("updatedAlerts", [this.alertObjet]);
 
       if (this.type != null && this.condition != null && this.value != null) {
-         this.$socket.client.emit("addAlerts", {});
-         let modifiedAlerts = this.existingAlerts.push(this.alertObjet);
-       
-        console.log("added");
+        this.$socket.client.emit("addAlerts", {});
+        let modifiedAlerts = this.existingAlerts.push(this.alertObjet);
       }
     },
   },
@@ -169,6 +160,6 @@ export default {
 }
 
 .samehight {
-  height: 326px;
+  height: 460px;
 }
 </style>
