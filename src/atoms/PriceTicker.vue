@@ -59,7 +59,7 @@ export default {
         if (eval(toEvel)) {
           this.playNotification();
           this.alertList.splice(x, 1);
-          this.$socket.client.emit("removeAlerts", {});
+          this.$socket.client.emit("removeAlerts", { message: "Conditions For One Of Your Alerts Has Been Met"});
         }
       }
      }

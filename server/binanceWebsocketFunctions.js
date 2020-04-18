@@ -106,12 +106,12 @@ exports.socketFunctions = function(socket) {
     });
   });
 
-  socket.on("addAlerts", async function(dump) {
+  socket.on("addAlerts", async function(data) {
     socket.emit("clientMessage", { message: "Alert Has Been Created", type: true });
   });
 
-  socket.on("removeAlerts", async function(dump) {
-    socket.emit("clientMessage", { message: "Conditions for one of your alerts has been met", type: true });
+  socket.on("removeAlerts", async function(data) {
+    socket.emit("clientMessage", { message: data.message, type: true });
   });
 
   socket.on("homeOrder", async function(dump) {

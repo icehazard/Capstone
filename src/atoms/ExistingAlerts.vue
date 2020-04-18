@@ -17,11 +17,11 @@
               </template>
             </v-data-table> -->
 
-            <v-sheet class="mx-auto" elevation="8" max-width="800" min-height="264" color="grey darken-4">
+            <v-sheet class="mx-auto" elevation="8" max-width="800" min-height="244" color="grey darken-4">
               
               <v-slide-group v-model="model" class="pa-4" multiple show-arrows>
                 <v-slide-item v-for="(alert, idx) in alertList" :key="idx" v-slot:default="{ active, toggle }">
-                  <v-card :color="active ? 'primary' : 'grey darken-2'" class="ma-4" height="200" width="100" @click="toggle">
+                  <v-card :color="active ? 'primary' : 'grey darken-2'" class="ma-4" height="180" width="100" @click="toggle">
                     <v-row class="fill-height" align="center" justify="center">
                       <v-container class="ml-5">
                         <v-row justify="center">
@@ -80,7 +80,7 @@ export default {
     deleteItem(idx) {
       const index = this.alertList.indexOf(idx);
       this.alertList.splice(index, 1);
-      this.$socket.client.emit("removeAlerts", {});
+      this.$socket.client.emit("removeAlerts", {message: "You Have Successfully Deleted The Alert"});
     },
     click(val) {
       console.log("hello", val);
