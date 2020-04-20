@@ -31,38 +31,43 @@ export default {
     ema1() {
       return this.$store.state.ema1.toFixed(4);
     },
+    symbol() {
+      return this.$store.state.symbol;
+    },
+    timeFrame() {
+      return this.$store.state.timeFrame;
+    },
   },
   watch: {
     price(val) {
+      if (this.alertList.length > 0) {
+        for (let x in this.alertList) {
+          if (this.alertList[x].timeframe == this.timeFrame && this.alertList[x].asset == this.symbol) {
+            let toEvel;
+            let condition = this.alertList[x].condition;
+            let value = this.alertList[x].value;
 
+            if (this.alertList[x].type == "Stoch") {
+              toEvel = this.stoch + " " + condition + " " + value;
+            }
+            if (this.alertList[x].type == "EMA") {
+              toEvel = this.ema1 + " " + condition + " " + value;
+            }
+            if (this.alertList[x].type == "Price") {
+              toEvel = this.price + " " + condition + " " + value;
+            }
+            if (this.alertList[x].type == "RSI") {
+              toEvel = this.rsi + " " + condition + " " + value;
+            }
 
-     for( let x in this.alertList){
-        if (this.alertList.length > 0) {
-        let type = [];
-        if (this.alertList[x].type == "Stoch") {
-          type.push(this.stoch);
-        }
-        if (this.alertList[x].type == "EMA") {
-          type.push(this.ema1);
-        }
-        if (this.alertList[x].type == "Price") {
-          type.push(this.price);
-        }
-        if (this.alertList[x].type == "RSI") {
-          type.push(this.rsi);
-        }
-
-        let condition = this.alertList[x].condition;
-        let value = this.alertList[x].value;
-        let toEvel = type[x] + " " + condition + " " + value;
-
-        if (eval(toEvel)) {
-          this.playNotification();
-          this.alertList.splice(x, 1);
-          this.$socket.client.emit("removeAlerts", { message: "Conditions For One Of Your Alerts Has Been Met"});
+            if (eval(toEvel)) {
+              this.playNotification();
+              this.alertList.splice(x, 1);
+              this.$socket.client.emit("removeAlerts", { message: "Conditions For One Of Your Alerts Has Been Met" });
+            }
+          }
         }
       }
-     }
     },
   },
   methods: {

@@ -13,7 +13,7 @@ export default {
       interval: null,
       emitInterval: null,
       change: false,
-      intervalFrequency: 1000,
+      intervalFrequency: 500,
       tradeHistory: []
     };
   },

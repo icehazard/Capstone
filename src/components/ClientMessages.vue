@@ -1,8 +1,9 @@
 <template>
   <section>
     <v-snackbar v-model="snackbar" color="grey darken-3">
-      <v-icon v-if="type" color="green"> mdi-check-circle-outline</v-icon>
-      <v-icon v-else color="red"> mdi-alert-circle-outline</v-icon>
+       <v-icon v-if="type == 'neutral'" class="mr-2">mdi mdi-av-timer</v-icon>
+      <v-icon v-else-if="type" color="green"> mdi-check-circle-outline</v-icon>
+      <v-icon v-else-if="!type" color="red"> mdi-alert-circle-outline</v-icon>
       <div class="ml-2">{{ text }}</div>
       <v-btn color="primary" text @click="snackbar = false">
         Close

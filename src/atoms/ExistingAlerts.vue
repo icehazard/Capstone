@@ -8,37 +8,39 @@
           </v-col>
         </v-row>
         <v-row>
+          <!-- <v-btn @click="undoFunction()">d</v-btn> -->
           <v-col>
-            <!-- <v-data-table color="grey darken-4" :headers="headers" hide-default-footer :items="alertList" class="elevation-1">
-              <template v-slot:item.action="{ item }">
-                <v-icon small class="mr-2" @click="deleteItem(item)">
-                  mdi mdi-trash-can
-                </v-icon>
-              </template>
-            </v-data-table> -->
-
-            <v-sheet class="mx-auto" elevation="8" max-width="800" min-height="244" color="grey darken-4">
-              
+            <v-sheet class="mx-auto unselectable" elevation="8" max-width="800" min-height="244" color="grey darken-4">
               <v-slide-group v-model="model" class="pa-4" multiple show-arrows>
                 <v-slide-item v-for="(alert, idx) in alertList" :key="idx" v-slot:default="{ active, toggle }">
-                  <v-card :color="active ? 'primary' : 'grey darken-2'" class="ma-4" height="180" width="100" @click="toggle">
-                    <v-row class="fill-height" align="center" justify="center">
-                      <v-container class="ml-5">
-                        <v-row justify="center">
-                          <v-col > {{ alert.type }} </v-col>
-                        </v-row>
-                        <v-row >
-                          <v-col justify="center"> {{ alert.condition }} </v-col>
-                        </v-row>
-                        <v-row>
-                          <v-col> {{ alert.value }} </v-col>
-                        </v-row>
-                      </v-container>
+                  <v-card :color="active ? 'primary' : 'grey darken-2'" class="ma-4" height="180" width="120" @click="toggle">
+                    <v-sheet class="">
+                      <v-row justify="center">
+                        <div class="my-1">{{ alert.type }}</div>
+                      </v-row>
+                    </v-sheet>
+                    <v-scale-transition>
+                      <v-icon class="abs" v-if="active" @click="deleteItem(alert)" color="grey darken-3" size="48" v-text="'mdi-close-circle-outline'"></v-icon>
+                    </v-scale-transition>
 
-                      <v-scale-transition>
-                        <v-icon class="abs" v-if="active" @click="deleteItem(alert)" color="white" size="48" v-text="'mdi-close-circle-outline'"></v-icon>
-                      </v-scale-transition>
+                    <v-row class="mt-8 overline" :class="{ blur: active }" justify="center">
+                      {{ alert.condition | text }}
                     </v-row>
+
+                    <v-row class="mt-2 title" :class="{ blur: active }" justify="center">
+                      {{ alert.value }}
+                    </v-row>
+
+                    <v-sheet class="mt-6 overline">
+                      <v-row>
+                        <v-col class="ml-2">
+                          {{ alert.timeframe }}
+                        </v-col>
+                        <v-col class="ml-n3 mr-2 ">
+                          {{ alert.asset }}
+                        </v-col>
+                      </v-row>
+                    </v-sheet>
                   </v-card>
                 </v-slide-item>
               </v-slide-group>
@@ -62,6 +64,7 @@ export default {
   },
   data() {
     return {
+      undo: [],
       model: [],
       headers: [
         {
@@ -79,11 +82,19 @@ export default {
   methods: {
     deleteItem(idx) {
       const index = this.alertList.indexOf(idx);
-      this.alertList.splice(index, 1);
-      this.$socket.client.emit("removeAlerts", {message: "You Have Successfully Deleted The Alert"});
+      this.undo.push(this.alertList.splice(index, 1));
+      this.$socket.client.emit("removeAlerts", { message: "Alert Has Been Deleted" });
     },
-    click(val) {
-      console.log("hello", val);
+    undoFunction() {
+      if (this.undo.length > 0) {
+        let alertObjet = this.undo.splice(this.undo.length - 1, 1);
+        this.$store.state.alerts.push(alertObjet[0][0]);
+      }
+    },
+  },
+  filters: {
+    text(val) {
+      return val == ">" ? "Above" : "Below";
     },
   },
   computed: {
@@ -109,12 +120,25 @@ export default {
 };
 </script>
 
-<style>
+<style lang="less">
 .abs {
   position: absolute;
+  right: 35px;
+  top: 70px;
+  z-index: 1;
 }
 
-.dd {
-  display: flex;
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.blur {
+  filter: blur(4px);
+  transition: ease 0.25s;
 }
 </style>

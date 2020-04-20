@@ -129,8 +129,9 @@ export default {
   mounted() {},
   methods: {
     values() {
-      this.alertObjet = { type: this.type, condition: this.condition, value: Number(this.value) };
+      this.alertObjet = { type: this.type, condition: this.condition, value: Number(this.value), asset:  this.symbol, timeframe: this.timeFrame};
 
+      console.log("values -> this.alertObjet", this.alertObjet)
       if (this.type != null && this.condition != null && this.value != null) {
         this.$socket.client.emit("addAlerts", {});
         let modifiedAlerts = this.existingAlerts.push(this.alertObjet);
@@ -141,6 +142,12 @@ export default {
     existingAlerts() {
       return this.$store.state.alerts;
     },
+    symbol() {
+      return this.$store.state.symbol;
+    },
+    timeFrame() {
+      return this.$store.state.timeFrame;
+    }
   },
   watch: {
     alert(val) {

@@ -20,7 +20,7 @@ export default {
       this.$socket.client.emit("buy", { price: this.price, usdt: this.usdt, symbol: this.symbol, target: this.target });
     },
     sell(val) {
-      this.$socket.client.emit("sell", { symbol: this.symbol, asset: this.asset });
+      this.$socket.client.emit("sellGroup", { symbol: this.symbol, asset: this.asset });
     },
     modify(val) {
       this.disableSlider = !this.disableSlider;

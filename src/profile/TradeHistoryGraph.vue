@@ -29,12 +29,24 @@ export default {
       let object = val;
       this.value = [];
 
+      for (let x in object) {
+        if (object[x - 1]) {
+          if (object[x].isBuyer == object[x - 1].isBuyer) {
+            let aa = Number(object[x].quoteQty) + Number(object[x - 1].quoteQty);
+            object[x].quoteQty = aa;
+            object.splice(Number(x) - 1, 1);
+          }
+        }
+      }
+
       for (let x of object) {
-        if (x.quoteQty > 10) {
+        if (x.quoteQty > 15) {
           let converted = Number(x.quoteQty);
           this.value.push(converted);
         }
       }
+
+      console.log(object);
     },
   },
   mounted() {
