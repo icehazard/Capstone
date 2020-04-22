@@ -39,9 +39,13 @@ export default new Vuex.Store({
     historicalDataFinishingDate: null,
     historicalDataTimeframe: "",
     setStopLossOnGraphMode: false,
-    alerts: []
+    alerts: [],
+    targetLine: null
   },
   mutations: {
+    updatedTargetLine(state, n) {
+      state.targetLine = n;
+    },
     updatedAlerts(state, n) {
       state.alerts = n;
     },

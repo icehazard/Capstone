@@ -48,19 +48,20 @@ export default {
             let value = this.alertList[x].value;
 
             if (this.alertList[x].type == "Stoch") {
-              toEvel = this.stoch + " " + condition + " " + value;
+              toEvel = this.stoch + " " + condition + "= " + value;
             }
             if (this.alertList[x].type == "EMA") {
-              toEvel = this.ema1 + " " + condition + " " + value;
+              toEvel = this.ema1 + " " + condition + "= " + value;
             }
             if (this.alertList[x].type == "Price") {
-              toEvel = this.price + " " + condition + " " + value;
+              toEvel = this.price + " " + condition + "= " + value;
             }
             if (this.alertList[x].type == "RSI") {
-              toEvel = this.rsi + " " + condition + " " + value;
+              toEvel = this.rsi + " " + condition + "= " + value;
             }
-
+console.log("price -> toEvel", toEvel)
             if (eval(toEvel)) {
+              
               this.playNotification();
               this.alertList.splice(x, 1);
               this.$socket.client.emit("removeAlerts", { message: "Conditions For One Of Your Alerts Has Been Met" });

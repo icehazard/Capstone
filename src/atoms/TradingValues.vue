@@ -146,6 +146,7 @@ export default {
     },
     targetPercent() {
       if (this.idlePosition && this.tradeStopOrder != 0 && this.modify) {
+        this.$store.commit("updateTargetPrice", this.tradelimitOrder);
         return this.tradelimitOrder;
       } else {
         let targetP = (this.price + (this.target / 100) * this.price).toFixed(4);

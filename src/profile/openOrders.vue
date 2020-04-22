@@ -56,7 +56,6 @@ this.$socket.client.emit("CancelAllOrder", {});
       this.data = val;
     },
     CancelAllOrder(val) {
-      console.log("TCL: gg -> val", val);
        this.$socket.client.emit("openOrders", {});
     }
   },

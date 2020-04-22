@@ -14,7 +14,7 @@ export default {
       emitInterval: null,
       change: false,
       intervalFrequency: 500,
-      tradeHistory: []
+      tradeHistory: [],
     };
   },
   sockets: {
@@ -30,7 +30,7 @@ export default {
       if (!val[0]) return (this.tradeHistory = []);
       var jsonString = JSON.stringify(val, this.replacer);
       this.tradeHistory = JSON.parse(jsonString);
-    }
+    },
   },
   computed: {
     stopAndPriceLines() {
@@ -53,7 +53,13 @@ export default {
     },
     stopLoss() {
       return this.$store.state.setStopLossOnGraphMode;
-    }
+    },
+    tradelimitOrder() {
+      return this.$store.state.targetPrice;
+    },
+    targetLine() {
+      return this.$store.state.targetLine;
+    },
   },
   watch: {
     timeFrame() {
@@ -61,7 +67,7 @@ export default {
     },
     symbol() {
       this.mana();
-    }
+    },
   },
   methods: {
     replacer(key, value) {
@@ -96,19 +102,19 @@ export default {
           top: 20,
           right: 60,
           bottom: 30,
-          left: 50
+          left: 50,
         },
         ohlc: {
-          height: 500
+          height: 500,
         },
         indicator: {
           height: 100,
-          padding: 5
-        }
+          padding: 5,
+        },
       };
       dim.plot = {
         width: dim.width - dim.margin.left - dim.margin.right,
-        height: dim.height - dim.margin.top - dim.margin.bottom
+        height: dim.height - dim.margin.top - dim.margin.bottom,
       };
       dim.indicator.top = dim.ohlc.height + dim.indicator.padding;
       dim.indicator.bottom = dim.indicator.top + dim.indicator.height;
@@ -505,19 +511,25 @@ export default {
         .attr("x1", 0)
         .attr("x2", dim.plot.width);
 
-      //mousemove
-      // svg.on("click", function() {
-      //   console.log("graph -> x", y.invert(d3.mouse(this)[1]));
-      // });
+      svg
+        .append("g")
+        .append("line")
+        .style("stroke", "#BF360C")
+        .style("opacity", "0")
+        .style("stroke-dasharray", "3, 3")
+        .attr("class", "targetLine")
+        .attr("clip-path", "url(#ohlcClip)")
+        .attr("x1", 0)
+        .attr("x2", dim.plot.width);
 
       svg.on("click", function() {
-            if (parentThis.stopLoss == true) {
-              console.log("Setting Stop Loss");
+        if (parentThis.stopLoss == true) {
+          console.log("Setting Stop Loss");
 
-              console.log("graph -> x", y.invert(d3.mouse(this)[1]));
-              parentThis.$store.commit("updatedSetStopLossOnGraphMode", y.invert(d3.mouse(this)[1]));
-            }
-          });
+          console.log("graph -> x", y.invert(d3.mouse(this)[1]));
+          parentThis.$store.commit("updatedSetStopLossOnGraphMode", y.invert(d3.mouse(this)[1]));
+        }
+      });
 
       this.interval = setInterval(() => {
         if (this.data[0]) {
@@ -533,7 +545,7 @@ export default {
                 high: +d[2],
                 low: +d[3],
                 close: +d[4],
-                volume: +d[5]
+                volume: +d[5],
               };
             })
             .sort(function(a, b) {
@@ -567,6 +579,11 @@ export default {
               .datum(trades)
               .call(tradearrow);
           }
+
+          if (parentThis.targetLine == false) {
+            d3.select(".targetLine").style("opacity", "0");
+          }
+
           if (parentThis.tradingArrows == false) {
             d3.select("g.tradearrow > g.data").remove();
           }
@@ -635,8 +652,6 @@ export default {
           svg.select("g.crosshair.rsi").call(rsiCrosshair);
           svg.select("g.crosshair.rsiStoch").call(rsiStochCrosshair);
 
-          
-
           if (!t) {
             zoomableInit = x
               .zoomable()
@@ -700,16 +715,24 @@ export default {
           svg.select("g.tradearrow").call(tradearrow.refresh);
         }
 
+        if (parentThis.targetLine == true) {
+          svg
+            .select(".targetLine")
+            .style("opacity", "0.6")
+            .attr("y1", y(parentThis.tradelimitOrder))
+            .attr("y2", y(parentThis.tradelimitOrder));
+        }
+
         if (parentThis.stopAndPriceLines == true) {
           svg
             .select(".livePriceLine")
-            .style("opacity", "0.55")
+            .style("opacity", "0.6")
             .attr("y1", y(parentThis.price))
             .attr("y2", y(parentThis.price));
 
           svg
             .select(".stopLossDashedLine")
-            .style("opacity", "0.5")
+            .style("opacity", "0.6")
             .attr("y1", y(parentThis.stoploss))
             .attr("y2", y(parentThis.stoploss));
         }
@@ -719,7 +742,7 @@ export default {
         let widthX = dim.width - 110;
         document.querySelector("g.rsiStoch.indicator g.axis.right").style.transform = " translate(" + widthX + "px, 25px)";
       }
-    }
+    },
   },
   beforeDestroy() {
     clearInterval(this.interval);
@@ -733,7 +756,7 @@ export default {
     }, this.intervalFrequency);
 
     this.graph();
-  }
+  },
 };
 </script>
 
