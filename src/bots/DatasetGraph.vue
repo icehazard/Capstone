@@ -234,7 +234,7 @@ text {
 }
 
 path.candle {
-  stroke: #000000;
+  stroke: white;
 }
 
 path.candle.body {

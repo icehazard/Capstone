@@ -56,8 +56,10 @@ export default {
       this.disableSlider = !this.disableSlider;
       this.$store.commit("updatemodifyTrade", this.disableSlider);
       if (!this.disableSlider) return;
+      console.log(this.stoploss)
+      let stop = this.stoploss-0.0002
 
-      this.$socket.client.emit("buyGroup", { price: this.price, usdt: this.usdt, symbol: this.symbol, target: this.target, stoploss: this.stoploss, asset: this.asset, modify: true });
+      this.$socket.client.emit("buyGroup", { price: this.price, usdt: this.usdt, symbol: this.symbol, target: this.target, stoploss: stop, asset: this.asset, modify: true });
       this.dialog = false;
     },
     close(){
@@ -68,12 +70,23 @@ export default {
   },
   sockets: {
     openOrders(val) {
+      let targetExists = false;
+      let stopExists = false;
       for (let x in val) {
         if (val[x].type == "LIMIT_MAKER") {
+          targetExists = true;
           this.$store.commit("updatetradelimitOrder", Number(val[x].price).toFixed(4));
         } else if (val[x].type == "STOP_LOSS_LIMIT") {
+          stopExists = true;
           this.$store.commit("updatetradeStopOrder", Number(val[x].stopPrice).toFixed(4));
         }
+      }
+
+      if(!targetExists || val.length == 0 ){
+         this.$store.commit("updatetradelimitOrder", 0);
+      }
+      if(!stopExists || val.length == 0){
+         this.$store.commit("updatetradeStopOrder", 0);
       }
     },
   },

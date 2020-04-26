@@ -11,6 +11,12 @@
 </template>
 
 <script>
+
+// import Binance from 'binance-api-node'
+// const client = Binance()
+
+
+
 export default {
   computed: {
     alertList() {
@@ -44,27 +50,28 @@ export default {
         for (let x in this.alertList) {
           if (this.alertList[x].timeframe == this.timeFrame && this.alertList[x].asset == this.symbol) {
             let toEvel;
+            let type = this.alertList[x].type
             let condition = this.alertList[x].condition;
             let value = this.alertList[x].value;
 
-            if (this.alertList[x].type == "Stoch") {
+            if (type == "Stoch") {
               toEvel = this.stoch + " " + condition + "= " + value;
             }
-            if (this.alertList[x].type == "EMA") {
+            if (type == "EMA") {
               toEvel = this.ema1 + " " + condition + "= " + value;
             }
-            if (this.alertList[x].type == "Price") {
+            if (type == "Price") {
               toEvel = this.price + " " + condition + "= " + value;
             }
-            if (this.alertList[x].type == "RSI") {
+            if (type == "RSI") {
               toEvel = this.rsi + " " + condition + "= " + value;
             }
-console.log("price -> toEvel", toEvel)
+
             if (eval(toEvel)) {
               
               this.playNotification();
-              this.alertList.splice(x, 1);
-              this.$socket.client.emit("removeAlerts", { message: "Conditions For One Of Your Alerts Has Been Met" });
+              this.alertList.splice(x, 1); 
+              this.$socket.client.emit("removeAlerts", { message: "Conditions For A " + type + "  Alert Has Been Met" });
             }
           }
         }
@@ -100,7 +107,12 @@ console.log("price -> toEvel", toEvel)
       return val.toFixed(6);
     },
   },
-  mounted() {},
+  mounted() {
+
+  //     client.ws.candles(this.symbol, this.timeFrame, candle => {
+  //   console.log(candle)
+  // })
+  },
 };
 </script>
 

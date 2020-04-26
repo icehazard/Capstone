@@ -13,7 +13,7 @@ export default {
       interval: null,
       emitInterval: null,
       change: false,
-      intervalFrequency: 500,
+      intervalFrequency: 1000,
       tradeHistory: [],
     };
   },
@@ -769,6 +769,7 @@ text {
   fill: none;
   stroke-width: 1;
 }
+
 
 path.candle {
   stroke: #ffffff;

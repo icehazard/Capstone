@@ -10,7 +10,7 @@ var fs = require("fs");
 module.exports = {
   async getKlines(data, socket) {
     try {
-      let url = "https://api.binance.com/api/v3/klines?symbol=" + data.symbol + "&interval=" + data.timeframe;
+      let url = "https://api.binance.com/api/v3/klines?symbol=" + data.symbol + "&interval=" + data.timeframe;   
       let res = await fetch(url);
       res = await res.json();
       socket.emit("getKlines", { data: res, timeframe: data.timeframe });
@@ -20,7 +20,7 @@ module.exports = {
     }
   },
 
-  async stoploss(client, socket, data) {
+  async stoploss(client, socket, data) { 
     try {
       await client.order({
         symbol: data.symbol,

@@ -117,7 +117,7 @@ exports.socketFunctions = function(socket) {
     console.log("**BUY** Trade COMPLETE");
   });
 
-  socket.on("sellGroup", async function(data) {
+  socket.on("sellGroup", async function(data) { 
     const client = await authBinance();
     const user = await auth();
     const cancel = await raw.cancelOrders(client, user, socket, data);
