@@ -146,6 +146,7 @@ module.exports = {
 
   async buy(client, socket, data) {
     let amount = ((data.usdt / data.price) * 0.99).toFixed(2);
+    console.log("buy -> amount", data)
     try {
       await client.order({
         symbol: data.symbol,

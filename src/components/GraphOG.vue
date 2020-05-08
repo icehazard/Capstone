@@ -15,6 +15,7 @@ export default {
       change: false,
       intervalFrequency: 1000,
       tradeHistory: [],
+      memInterval: null,
     };
   },
   sockets: {
@@ -747,13 +748,26 @@ export default {
   beforeDestroy() {
     clearInterval(this.interval);
     clearInterval(this.emitInterval);
+    clearInterval(this.memInterval);
     document.title = "Boca";
   },
   mounted() {
     this.$socket.client.emit("getKlines", { timeframe: this.timeFrame, symbol: this.symbol });
+
     this.emitInterval = setInterval(() => {
       this.$socket.client.emit("getKlines", { timeframe: this.timeFrame, symbol: this.symbol });
     }, this.intervalFrequency);
+
+
+    //for the memory lag
+    this.memInterval = setInterval(() => {
+      clearInterval(this.interval);
+      d3.select(".graph")
+        .selectAll("*")
+        .remove();
+
+      this.graph();
+    }, 3600 * 1000);
 
     this.graph();
   },
@@ -769,7 +783,6 @@ text {
   fill: none;
   stroke-width: 1;
 }
-
 
 path.candle {
   stroke: #ffffff;
