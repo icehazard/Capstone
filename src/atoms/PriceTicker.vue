@@ -3,7 +3,7 @@
     <v-flex>
       <v-card>
         <v-card-title class="pa-5 justify-center">
-          {{ price | price }}
+          {{ price | price}}
         </v-card-title>
       </v-card>
     </v-flex>
@@ -23,7 +23,7 @@ export default {
       return this.$store.state.alerts;
     },
     price() {
-      return this.$store.state.price.toFixed(4);
+      return this.$store.state.price
     },
     macD() {
       return (this.$store.state.macD * 100000).toFixed(2);
@@ -101,10 +101,14 @@ export default {
   filters: {
     price(val) {
       val = Number(val);
-      if (val > 100) return val.toFixed(2);
-      if (val > 10) return val.toFixed(3);
-      if (val > 0.1) return val.toFixed(4);
-      return val.toFixed(6);
+      if (val > 10000) return val.toFixed(0);
+      if (val > 10) return val.toFixed(2);
+      if (val > 1) return val.toFixed(3);
+      if (val > 0.01) return val.toFixed(4);
+      if (val > 0.001) return val.toFixed(5);
+      if (val > 0.0001) return val.toFixed(6);
+      if (val > 0.00001) return val.toFixed(7);
+      if (val > 0.00001) return val.toFixed(8);
     },
   },
   mounted() {

@@ -41,16 +41,7 @@ export default {
       imgAlt: new Image(30, 30),
       data: [],
       interval: null,
-      headers: [
-        { text: "Rank", value: "rank" },
-        { text: "", value: "icon" },
-        { text: "Name", value: "name" },
-        { text: "Symbol", value: "symbol" },
-        { text: "Price", value: "priceUsd" },
-        { text: "Market Cap", value: "marketCapUsd" },
-        { text: "Volume (24Hr)", value: "volumeUsd24Hr" },
-        { text: "Change (24Hr)", value: "changePercent24Hr" }
-      ]
+      headers: [{ text: "Rank", value: "rank" }, { text: "", value: "icon" }, { text: "Name", value: "name" }, { text: "Symbol", value: "symbol" }, { text: "Price", value: "priceUsd" }, { text: "Market Cap", value: "marketCapUsd" }, { text: "Volume (24Hr)", value: "volumeUsd24Hr" }, { text: "Change (24Hr)", value: "changePercent24Hr" }],
     };
   },
   methods: {},
@@ -68,6 +59,19 @@ export default {
       if (val > 0.01) return "$" + val.toFixed(4);
       return "$" + val.toFixed(6);
     },
+    price(val) {
+      val = Number(val);
+      if (val > 10000) return "$" + val.toFixed(0);
+      if (val > 100) return "$" + val.toFixed(2);
+      if (val > 1) return "$" + val.toFixed(3);
+      if (val > 0.1) return "$" + val.toFixed(3);
+      if (val > 0.01) return "$" + val.toFixed(4);
+      if (val > 0.001) return "$" + val.toFixed(5);
+      if (val > 0.0001) return "$" + val.toFixed(6);
+      if (val > 0.00001) return "$" + val.toFixed(7);
+      if (val > 0.000001) return "$" + val.toFixed(8);
+      return "$" + val.toFixed(8);
+    },
     marketCap(val) {
       val = Number(val);
       if (val > 1000000000000) return "$" + Math.round(val / 1000000000000) + " T";
@@ -75,7 +79,7 @@ export default {
       if (val > 1000000) return "$" + Math.round(val / 1000000) + " M";
       if (val > 1000) return "$" + Math.round(val / 1000) + " K";
       return "$" + val.toFixed(0);
-    }
+    },
   },
   computed: {
     showTradingPairPanel() {
@@ -83,7 +87,7 @@ export default {
     },
     search() {
       return this.$store.state.searchTradingPairPanel;
-    }
+    },
   },
   sockets: {
     homeOrder(val) {
@@ -91,7 +95,7 @@ export default {
       for (let el of this.data) {
         el.icon = "https://static.coincap.io/assets/icons/" + String(el.symbol).toLowerCase() + "@2x.png";
       }
-    }
+    },
   },
   beforeDestroy() {
     clearInterval(this.interval);
@@ -102,7 +106,7 @@ export default {
     this.interval = setInterval(() => {
       this.$socket.client.emit("homeOrder");
     }, 1000);
-  }
+  },
 };
 </script>
 

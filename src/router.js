@@ -46,11 +46,6 @@ export default new Router({
       component: () => import('./views/CNN.vue')
     },
     {
-      path: '/rnn',
-      name: 'rnn',
-      component: () => import('./views/RNN.vue')
-    },
-    {
       path: '/data',
       name: 'data',
       component: () => import('./views/Data.vue')

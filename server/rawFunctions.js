@@ -159,8 +159,9 @@ module.exports = {
     } catch (e) {
       socket.emit("clientMessage", { message: "Insufficient Funds: Could Not Buy", type: false });
       console.log("**BUY** Insufficient Funds: Could Not Buy");
+
     }
-  },
+  }, 
 
   async limit(client, socket, data) {
     let amount = ((data.usdt / data.price) * 0.99).toFixed(2);

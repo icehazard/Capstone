@@ -54,7 +54,6 @@ export default {
   filters: {
     price(val) {
       val = Number(val);
-      
       if (val > 1000) return val.toFixed(0);
       if (val > 1) return val.toFixed(2);
       if (val == 0) return val.toFixed(2);

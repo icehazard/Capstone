@@ -16,8 +16,8 @@
       </v-tab>
 
       <v-tab>
-        <v-icon left>mdi-settings-box</v-icon>
-        Stategy Bulder
+        <v-icon left>mdi-update</v-icon>
+        Prediction
       </v-tab>
 
       <v-tab-item>
@@ -117,7 +117,7 @@ export default {
   },
   data: () => ({
     percentage: 0,
-    active_tab: 1,
+    active_tab: 2,
     tabs: [{ index: 0 }, { index: 1 }, { index: 2 }]
   }),
   methods: {
